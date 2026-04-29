@@ -1,0 +1,32 @@
+name: Repository hygiene
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  no-binary-junk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fail if tracked APK/AAB in repo root or Assets
+        run: |
+          set -e
+          if git ls-files '*.apk' '*.aab' 2>/dev/null | grep -q . ; then
+            echo "Remove APK/AAB from git; attach build artifacts in Actions or Releases instead."
+            git ls-files '*.apk' '*.aab'
+            exit 1
+          fi
+          if git ls-files | grep -E '(^|/)testApp\.apk$' ; then
+            exit 1
+          fi
+          echo "OK: no APK/AAB tracked."
+
+      - name: Prefer not committing Library/Temp (spot-check)
+        run: |
+          if git ls-files Library/ 2>/dev/null | head -1 | grep -q . ; then
+            echo "::warning::Library/ should not be tracked; fix .gitignore and git rm -r --cached Library"
+          fi

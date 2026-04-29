@@ -5,14 +5,12 @@ public class TestIntegration : MonoBehaviour, IAdCallback
 {
     const string LogTag = "[Direct SDK]";
 
-    /// <summary>Fixed demo placements (dashboard): image + header banner.</summary>
-    public const string PlacementBanner = "20212";
+    /// <summary>From <c>Resources/BidscubeDemoConfig.json</c> or defaults.</summary>
+    public static string PlacementBanner => BidscubeDemoRuntimeConfig.BannerPlacementId;
 
-    /// <summary>Fixed demo placement: video.</summary>
-    public const string PlacementVideo = "20213";
+    public static string PlacementVideo => BidscubeDemoRuntimeConfig.VideoPlacementId;
 
-    /// <summary>Fixed demo placement: native.</summary>
-    public const string PlacementNative = "20214";
+    public static string PlacementNative => BidscubeDemoRuntimeConfig.NativePlacementId;
 
     [Header("Bidscube SDK config")]
     public bool enableLogging = true;
