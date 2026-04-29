@@ -22,7 +22,7 @@ public class SdkLaunchHub : MonoBehaviour
 
     const string PrefMaxSdkKey = "bidscube_testapp_max_sdk_key";
     const string PrefMaxAdBanner = "bidscube_testapp_max_ad_banner";
-    /// <summary>Rewarded video ad unit (MAX «video» format).</summary>
+    /// <summary>Rewarded video ad unit (MAX "video" format).</summary>
     const string PrefMaxAdVideo = "bidscube_testapp_max_ad_rewarded";
 
     /// <summary>
@@ -149,7 +149,7 @@ public class SdkLaunchHub : MonoBehaviour
         AddTmpTitle(parent, "Bidscube SDK", 28f, FontStyles.Bold, TextAlignmentOptions.Center);
         AddTmpBody(
             parent,
-            "UPM <c>com.bidscube.sdk</c>. Pick an integration path — same panel layout and typography as Direct SDK.",
+            "UPM <c>com.bidscube.sdk</c>. Pick an integration path - same panel layout and typography as Direct SDK.",
             18f,
             LauncherBodyText);
 
@@ -166,28 +166,28 @@ public class SdkLaunchHub : MonoBehaviour
         AddTmpTitle(parent, "AppLovin MAX", 28f, FontStyles.Bold, TextAlignmentOptions.Center);
         AddTmpBody(
             parent,
-            "Banner + rewarded video. SDK key empty → same demo key as AppLovin Android <c>GlobalApplication.kt</c>. Ad unit fields empty or placeholders → built-in MAX «Enterprise Demo» fallbacks (<c>MaxEnterpriseDemoDefaults.cs</c>) with Android package <c>com.applovin.enterprise.apps.demoapp</c>. Paste your own IDs to override. Native ads → «Direct SDK». PlayerPrefs — test app only.",
+            "Banner and rewarded video. Leave the SDK key empty to use the same demo key as AppLovin Android <c>GlobalApplication.kt</c>. Leave ad unit fields empty or as placeholders to use built-in MAX \"Enterprise Demo\" fallbacks (<c>MaxEnterpriseDemoDefaults.cs</c>) with Android package <c>com.applovin.enterprise.apps.demoapp</c>. Paste your own IDs to override. Native ads use <c>Direct SDK</c>. PlayerPrefs apply to this test app only.",
             18f,
             LauncherBodyText,
             120f);
 
-        AddTmpMaxFieldCaption(parent, "MAX SDK key (empty → demo test key)");
+        AddTmpMaxFieldCaption(parent, "MAX SDK key (empty uses demo test key)");
         _maxSdkKeyInput = CreateFlatTmpInput(parent,
-            "Optional — paste your SDK key",
+            "Optional: paste your SDK key",
             PlayerPrefs.GetString(PrefMaxSdkKey, ""),
             preferredHeight: 54f);
         WireMaxPrefsOnEndEdit(_maxSdkKeyInput, PrefMaxSdkKey);
 
         AddTmpMaxFieldCaption(parent, "Banner ad unit ID");
         _maxBannerAdUnitInput = CreateFlatTmpInput(parent,
-            "Optional — empty uses Enterprise Demo fallback",
+            "Optional: empty uses Enterprise Demo fallback",
             PlayerPrefs.GetString(PrefMaxAdBanner, ""),
             preferredHeight: 52f);
         WireMaxAdUnitFieldEndEdit(_maxBannerAdUnitInput, PrefMaxAdBanner);
 
         AddTmpMaxFieldCaption(parent, "Video ad unit ID (rewarded)");
         _maxVideoAdUnitInput = CreateFlatTmpInput(parent,
-            "Optional — empty uses Enterprise Demo fallback",
+            "Optional: empty uses Enterprise Demo fallback",
             PlayerPrefs.GetString(PrefMaxAdVideo, ""),
             preferredHeight: 52f);
         WireMaxAdUnitFieldEndEdit(_maxVideoAdUnitInput, PrefMaxAdVideo);
@@ -235,7 +235,7 @@ public class SdkLaunchHub : MonoBehaviour
 
         AddTmpBody(
             parent,
-            $"Three formats — placements: banner {TestIntegration.PlacementBanner}, video {TestIntegration.PlacementVideo}, native {TestIntegration.PlacementNative}. Native/video preview in the dock below. Video: ✕ top-right to close.",
+            $"Three formats - placements: banner {TestIntegration.PlacementBanner}, video {TestIntegration.PlacementVideo}, native {TestIntegration.PlacementNative}. Video: X top-right to close.",
             18f,
             LauncherBodyText,
             120f);
@@ -306,7 +306,6 @@ public class SdkLaunchHub : MonoBehaviour
         hh.spacing = 8f;
         hh.padding = new RectOffset(4, 4, 0, 0);
 
-        AddTmpDockHint(hdr.transform, "Preview area for banner/native after the matching button. ✕ — clear ads. Drag the Direct SDK title to move the panel.");
         AddDockClearButton(hdr.transform, OnDirectClearAllAdsClicked);
 
         var slot = new GameObject("DirectAdSlot", typeof(RectTransform), typeof(Image), typeof(LayoutElement));
@@ -903,25 +902,6 @@ public class SdkLaunchHub : MonoBehaviour
         le.preferredHeight = 44f;
         le.flexibleWidth = 1f;
         return go;
-    }
-
-    static void AddTmpDockHint(Transform parent, string text)
-    {
-        var go = new GameObject("Dock hint (TMP)", typeof(RectTransform), typeof(TextMeshProUGUI), typeof(LayoutElement));
-        go.transform.SetParent(parent, false);
-        var le = go.GetComponent<LayoutElement>();
-        le.flexibleWidth = 1f;
-        le.minHeight = 36f;
-        le.preferredHeight = 36f;
-        var tmp = go.GetComponent<TextMeshProUGUI>();
-        ApplyDefaultTmpFont(tmp);
-        tmp.text = text;
-        tmp.fontSize = 14f;
-        tmp.fontStyle = FontStyles.Normal;
-        tmp.color = LauncherBodyText;
-        tmp.alignment = TextAlignmentOptions.MidlineLeft;
-        tmp.raycastTarget = false;
-        tmp.textWrappingMode = TextWrappingModes.Normal;
     }
 
     static void AddDockClearButton(Transform parent, UnityAction onClick)

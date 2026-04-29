@@ -10,7 +10,7 @@
       "url": "https://unity.packages.applovin.com"
     },
     "com.bidscube.applovin.max": {
-      "version": "https://github.com/BidsCube/AppLovin-SDK-for-BidsCube-Unity.git#v1.0.13",
+      "version": "https://github.com/BidsCube/AppLovin-SDK-for-BidsCube-Unity.git#v1.0.12",
       "depth": 0,
       "source": "git",
       "dependencies": {
@@ -18,7 +18,7 @@
         "com.unity.ugui": "2.0.0",
         "com.unity.textmeshpro": "3.0.6"
       },
-      "hash": "35377e2be10797db4e21143796cbe4aec10a9c5b"
+      "hash": "dfea074acae4d18f22bda6423d1b953a6fdcd0b5"
     },
     "com.bidscube.sdk": {
       "version": "https://github.com/BidsCube/bidscube-sdk-unity.git#v1.2.5",
