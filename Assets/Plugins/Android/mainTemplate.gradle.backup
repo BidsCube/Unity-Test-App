@@ -1,0 +1,82 @@
+apply plugin: 'com.android.library'
+apply from: '../shared/keepUnitySymbols.gradle'
+apply from: '../shared/common.gradle'
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    // Bidscube Android core (lite) is bundled into unityLibrary/libs by the post-process.
+    implementation(name: 'bidscube-sdk-lite-1.2.3', ext:'aar')
+    implementation(name: 'WebViewPlugin', ext:'aar')
+    implementation(name: 'applovin-bidscube-max-adapter-1.0.4', ext:'aar')
+    implementation(name: 'applovin-max-unity-plugin', ext:'aar')
+    implementation 'com.applovin:applovin-sdk:13.6.2'
+
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.core:core:1.9.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.games:games-activity:3.0.5'
+
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
+}
+
+android {
+    namespace "com.unity3d.player"
+    ndkPath "**NDKPATH**"
+    ndkVersion "**NDKVERSION**"
+    compileSdk **APIVERSION**
+    buildToolsVersion = "**BUILDTOOLS**"
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+        coreLibraryDesugaringEnabled true
+    }
+
+    defaultConfig {
+        consumerProguardFiles "proguard-unity.txt"
+        versionName "**VERSIONNAME**"
+        minSdk **MINSDKVERSION**
+        targetSdk **TARGETSDKVERSION**
+        versionCode **VERSIONCODE**
+
+        ndk {
+            abiFilters **ABIFILTERS**
+            debugSymbolLevel "none"
+        }
+
+        externalNativeBuild {
+            cmake {
+                arguments "-DANDROID_STL=c++_shared", "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"
+            }
+        }
+    }
+
+    lint {
+        abortOnError false
+    }
+
+    androidResources {
+        ignoreAssetsPattern = "!.svn:!.git:!.ds_store:!*.scc:!CVS:!thumbs.db:!picasa.ini:!*~"
+        noCompress = ['.unity3d', '.ress', '.resource', '.obb', '.bundle', '.unityexp'] + unityStreamingAssets.tokenize(', ')
+    }
+
+    packaging {
+        jniLibs {
+            useLegacyPackaging true
+        }
+    }
+}
+
+android.externalNativeBuild {
+    cmake {
+        version "3.22.1"
+        buildStagingDirectory "${unityProjectPath}/.utmp"
+        path "src/main/cpp/CMakeLists.txt"
+    }
+}
+
+android.buildFeatures {
+    prefab true
+}
+

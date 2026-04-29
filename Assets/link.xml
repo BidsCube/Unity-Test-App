@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<linker>
+  <!-- MaxSdk.Scripts has no callers from Bidscube DLLs except reflection; linker strips it unless preserved. -->
+  <assembly fullname="MaxSdk.Scripts" preserve="all" />
+</linker>

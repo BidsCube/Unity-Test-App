@@ -1,0 +1,7 @@
+{
+  "name": "MaxSdkIl2CppRoot",
+  "references": ["MaxSdk.Scripts"],
+  "autoReferenced": true,
+  "allowUnsafeCode": false,
+  "overrideReferences": false
+}
