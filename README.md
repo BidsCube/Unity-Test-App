@@ -16,10 +16,24 @@ Package versions are pinned in `Packages/manifest.json` (not duplicated here, so
 
 ## Demo video
 
-Screen recording of the launcher and flows ([`DOCUMENTATION.md`](DOCUMENTATION.md)) — file in the **repository root**: `video_2026-04-29_09-57-50.mp4`.
+Recording: **`video_2026-04-29_09-57-50.mp4`** (launcher walkthrough; see [DOCUMENTATION.md](DOCUMENTATION.md)).
 
-<!-- GitHub renders <video> in README when src points at raw file bytes. -->
-<video src="https://raw.githubusercontent.com/BidsCube/Unity-Test-App/main/video_2026-04-29_09-57-50.mp4" controls width="100%"></video>
+On **github.com**, a README shows a **playable** embedded video only when the Markdown contains a **video URL that GitHub generated for you** (hosting on their CDN). A plain `<video>` tag or a `raw.githubusercontent.com` link in the README is usually **not** rendered as a player on the repository home page.
 
-If the player does not load: open the file from the repo tree or use **[direct MP4 link](https://raw.githubusercontent.com/BidsCube/Unity-Test-App/main/video_2026-04-29_09-57-50.mp4)**.  
-If your export is not `.mp4`, either convert/rename for the URL above or change the filename in this README after you push the video.
+### Inline player in this README (recommended)
+
+Do this **once** on the website so the clip plays **right on** the repo main page:
+
+1. Open [**README.md** on GitHub](https://github.com/BidsCube/Unity-Test-App/blob/main/README.md) and click **Edit**.
+2. Drag **`video_2026-04-29_09-57-50.mp4`** into the editor (or paste the file). Stay within GitHub’s upload size limit (often **~10 MB** per file; re-encode if needed).
+3. After upload, GitHub inserts a **bare URL** on its own line, for example `https://github.com/user-attachments/assets/...` or `https://user-images.githubusercontent.com/.../....mp4`. **Keep that line.** It turns into an inline player with controls (unmute in the player if the track has sound).
+4. Commit the README change.
+
+That URL is independent of the copy committed in the repo folder; you can still keep the MP4 in git for backups, or rely only on the uploaded asset.
+
+### Same file without uploading again
+
+- **Playback on GitHub (file view):** [video_2026-04-29_09-57-50.mp4 on `main`](https://github.com/BidsCube/Unity-Test-App/blob/main/video_2026-04-29_09-57-50.mp4)
+- **Raw file:** [direct MP4](https://raw.githubusercontent.com/BidsCube/Unity-Test-App/main/video_2026-04-29_09-57-50.mp4)
+
+Change the branch or filename in these links if yours differ.
