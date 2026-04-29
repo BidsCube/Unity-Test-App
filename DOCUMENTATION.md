@@ -8,7 +8,7 @@ A screen recording of the launcher and flows described below is stored **next to
 
 | File | Notes |
 |------|--------|
-| **`video_2026-04-29_09-57-50`** | Use the full filename including your export extension (for example `.mp4`, `.mov`, or `.webm`). Unity does not reference this file in builds; it is documentation only for reviewers. |
+| **`video_2026-04-29_09-57-50.mp4`** | Screen recording in the repo root (see **README.md** for the embedded player). Use `.mp4` for reliable playback on GitHub; Unity does not import this file. |
 
 ---
 
@@ -123,7 +123,7 @@ When leaving a non-hub scene, it also calls **AppLovin MAX banner teardown** so 
 ## Quick file map
 
 ```
-video_2026-04-29_09-57-50.*   # Demo screen recording (repo root; extension per export)
+video_2026-04-29_09-57-50.mp4   # Demo recording (repo root; embedded in README.md)
 DOCUMENTATION.md              # This file
 Assets/
   BidscubeEmbeddedDemo/
