@@ -60,7 +60,10 @@ static class BidscubePublisherDemoDefines
                 continue;
             }
 
-            if (named == NamedBuildTarget.Unknown || named == NamedBuildTarget.Server)
+            if (named == NamedBuildTarget.Unknown)
+                continue;
+            // Skip dedicated-server target when present (API surface differs by Unity version).
+            if (string.Equals(named.TargetName, "Server", StringComparison.Ordinal))
                 continue;
 
             try
