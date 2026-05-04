@@ -55,6 +55,16 @@ Optional demo videos for publishers should **not** be committed to the repo root
 
 Pinned sources: **`Packages/manifest.direct.json`**, **`Packages/manifest.applovin.json`**, **`Packages/manifest.levelplay.json`**.
 
+## Package Manager: `.meta` / “immutable folder” warnings
+
+Unity may log **orphan `.meta`** (asset missing) or **missing `.meta`** for files under **`Packages/com.bidscube.*`**. Those folders come from **Git UPM** into **`Library/PackageCache`**, which Unity treats as **immutable**, so the editor cannot repair them from this project.
+
+- **Cause:** Stale or incomplete `.meta` layout in the **published** `com.bidscube.sdk` / `com.bidscube.applovin.max` (etc.) tags — not a bug in the demo repo.
+- **Impact:** Usually **noise** if everything compiles and runs; Editor scripts without `.meta` may be **ignored** — if anything breaks, report it to BidsCube with the package version from your manifest.
+- **What helps:** Close Unity, run **`./tools/reset-bidscube-package-cache.sh`**, reopen (forces a fresh cache). For a full reset, delete **`Library/`** entirely. Either way, warnings **can persist** until BidsCube ships fixed packages.
+
+More detail: **[DOCUMENTATION.md](DOCUMENTATION.md)** (Troubleshooting).
+
 ## Android build
 
 - Switch to the **Android** platform in **Build Settings**.
