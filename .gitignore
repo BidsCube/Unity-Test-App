@@ -47,3 +47,13 @@ Packages/packages-lock.json
 ._*
 Thumbs.db
 ehthumbs.db
+
+# Copied by Bidscube SDK WebView post-process in Editor (regenerate on open/resolve)
+Assets/Plugins/Android/WebViewPlugin.aar
+Assets/Plugins/Android/WebViewPlugin.aar.meta
+
+# Unity Performance Testing (local run metadata; not part of source demo)
+Assets/Resources/PerformanceTestRunInfo.json
+Assets/Resources/PerformanceTestRunInfo.json.meta
+Assets/Resources/PerformanceTestRunSettings.json
+Assets/Resources/PerformanceTestRunSettings.json.meta
