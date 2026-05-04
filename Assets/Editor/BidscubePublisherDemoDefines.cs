@@ -45,10 +45,24 @@ static class BidscubePublisherDemoDefines
         var hasLevelPlay = text.IndexOf("com.unity.services.levelplay", StringComparison.Ordinal) >= 0
             || text.IndexOf("com.bidscube.levelplay", StringComparison.Ordinal) >= 0;
 
-        foreach (NamedBuildTarget named in Enum.GetValues(typeof(NamedBuildTarget)))
+        // Unity 6: NamedBuildTarget is a struct, not an enum — do not use Enum.GetValues(typeof(NamedBuildTarget)).
+        foreach (BuildTargetGroup group in (BuildTargetGroup[])Enum.GetValues(typeof(BuildTargetGroup)))
         {
+            if (group == BuildTargetGroup.Unknown)
+                continue;
+            NamedBuildTarget named;
+            try
+            {
+                named = NamedBuildTarget.FromBuildTargetGroup(group);
+            }
+            catch
+            {
+                continue;
+            }
+
             if (named == NamedBuildTarget.Unknown || named == NamedBuildTarget.Server)
                 continue;
+
             try
             {
                 var defines = PlayerSettings.GetScriptingDefineSymbols(named);
@@ -64,7 +78,7 @@ static class BidscubePublisherDemoDefines
             }
             catch
             {
-                // NamedBuildTarget not applicable for this Unity install
+                // Group / named target not applicable for this Unity install
             }
         }
     }

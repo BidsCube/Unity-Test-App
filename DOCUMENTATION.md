@@ -112,9 +112,9 @@ Log prefix: **`[LevelPlay SDK]`**.
 | **LevelPlay** types missing | Same for `com.unity.services.levelplay` / `com.bidscube.levelplay`. |
 | **Duplicate class** / Dex merger errors | Usually two versions of the same Android artifact; resolve with EDM and **one** stack of package versions — do not add duplicate AARs here. |
 | Ads never load (1035 / no fill) | **Placeholder keys**, geo, **test mode**, and dashboard **placements / ad units** must match the running bundle ID / package name. |
-| **UnitySendMessage** errors | JNI bridge not loaded or wrong activity lifecycle — compare with official mediation SDK setup for your Unity version. |
-
-Search logs for: **Bidscube**, **BidsCube**, **AppLovin**, **MAX**, **LevelPlay**, **ironSource**, **duplicate class**, **UnitySendMessage**.
+| Console: **meta exists but asset** … **immutable folder** (BidsCube UPM packages) | Stale **`Library/PackageCache`** or package `.meta` out of sync with the published tarball. Close Unity, delete **`Library/`**, reopen and let packages re-resolve. If it persists, remove the relevant folders under **`Library/PackageCache`** for `com.bidscube.sdk` / `com.bidscube.applovin.max` and reopen. Lasting fix belongs in those **package repos** (correct or omit `.meta` for paths that no longer exist). |
+| **[BidscubePublisherDemoDefines] Type provided must be an Enum** | Fixed in demo: Unity 6’s **`NamedBuildTarget`** is not an `enum`. Pull latest **`BidscubePublisherDemoDefines.cs`** (iterates **`BuildTargetGroup`** + **`NamedBuildTarget.FromBuildTargetGroup`**). |
+ **Bidscube**, **BidsCube**, **AppLovin**, **MAX**, **LevelPlay**, **ironSource**, **duplicate class**, **UnitySendMessage**.
 
 ---
 
