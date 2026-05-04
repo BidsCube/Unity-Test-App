@@ -7,6 +7,7 @@ on:
 jobs:
   hygiene-and-manifests:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
@@ -16,12 +17,14 @@ jobs:
       - name: Repository hygiene + manifest pins
         run: bash tools/verify-publisher-demo-ready.sh
 
-      - name: Fail on tracked binary artifacts (spot check)
+      - name: Fail on tracked binary artifacts
         run: |
           set -euo pipefail
+
           if git ls-files | grep -E '\.(apk|aab|ipa|obb)$' | grep -q .; then
             echo "Tracked mobile build artifacts:"
             git ls-files | grep -E '\.(apk|aab|ipa|obb)$' || true
             exit 1
           fi
+
           echo "OK: no tracked apk/aab/ipa/obb."
