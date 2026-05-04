@@ -187,6 +187,7 @@ MonoBehaviour:
     m_StrikethroughOffset: 18
     m_StrikethroughThickness: 6.298828
     m_TabWidth: 24
+    m_UnitsPerEM: 2048
   m_GlyphTable: []
   m_CharacterTable: []
   m_AtlasTextures:

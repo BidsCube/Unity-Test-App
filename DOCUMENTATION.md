@@ -91,7 +91,8 @@ Log prefix: **`[LevelPlay SDK]`**.
 1. Select **Android** in **Build Settings**.
 2. For **applovin** / **levelplay** profiles: **Assets → External Dependency Manager → Android Resolver** (or **Force Resolve**).
 3. Build **APK/AAB** locally; outputs stay **untracked** (see `.gitignore`).
-4. Do not add **manual `implementation '...'` lines** to `mainTemplate.gradle` in this repo to “fix” mediation unless Unity/AppLovin/LevelPlay docs require a **documented** project-level hook — prefer fixing upstream packages.
+4. **Bidscube core on Android:** `Assets/Plugins/Android/mainTemplate.gradle` uses **`implementation 'com.bidscube:bidscube-sdk:1.2.3@aar'`** (aligned with `com.bidscube.applovin.max` `AdapterPackageInfo`) so Gradle resolves when the adapter **Gradle postprocessor** does not run (e.g. Editor scripts in PackageCache without `.meta`). **Player Settings** enables **Custom Main Gradle Template** so this template is used.
+5. **Duplicate `com.bidscube.sdk` in Dex** can happen if both this line and the adapter’s `// __BIDSCUBE_ANDROID_MANAGED_START__` block pull the core; remove the duplicate path in the exported Gradle or fix upstream package metas so one pipeline owns core resolution.
 
 ---
 

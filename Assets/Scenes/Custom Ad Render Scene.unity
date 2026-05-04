@@ -1856,7 +1856,6 @@ GameObject:
   - component: {fileID: 1342614456}
   - component: {fileID: 1342614455}
   - component: {fileID: 1342614458}
-  - component: {fileID: 1342614459}
   m_Layer: 0
   m_Name: EventSystem
   m_TagString: Untagged
@@ -1952,27 +1951,6 @@ MonoBehaviour:
   customAdRenderScene:
     sceneName: Custom Ad Render Scene
     sceneIndex: -1
---- !u!114 &1342614459
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1342614454}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8128f808a8b630f4db25cb48d30eb3d1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: BidscubeSDK::BidscubeSDK.CustomAdRenderController
-  _bannerPlacementId: 20212
-  _videoPlacementId: 20213
-  _nativePlacementId: 20214
-  _adDisplayArea: {fileID: 313717469}
-  _showBannerButton: {fileID: 436421946}
-  _showVideoButton: {fileID: 977782625}
-  _showNativeButton: {fileID: 209618219}
-  _resultText: {fileID: 2087364069}
-  _initializeSdkButton: {fileID: 647648005}
 --- !u!1 &1469390536
 GameObject:
   m_ObjectHideFlags: 0

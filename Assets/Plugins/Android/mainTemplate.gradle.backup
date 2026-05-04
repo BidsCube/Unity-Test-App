@@ -5,8 +5,8 @@ apply from: '../shared/common.gradle'
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    // Bidscube Android core (lite) is bundled into unityLibrary/libs by the post-process.
-    implementation(name: 'bidscube-sdk-lite-1.2.3', ext:'aar')
+    // Android core via Maven — see comment in mainTemplate.gradle
+    implementation 'com.bidscube:bidscube-sdk:1.2.3@aar'
     implementation(name: 'WebViewPlugin', ext:'aar')
     implementation(name: 'applovin-bidscube-max-adapter-1.0.4', ext:'aar')
     implementation(name: 'applovin-max-unity-plugin', ext:'aar')
