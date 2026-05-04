@@ -1,3 +1,4 @@
+#if BIDSCUBE_HAS_APPLOVIN
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -24,21 +25,21 @@ public partial class SdkLaunchHub
         AddTmpMaxFieldCaption(parent, "MAX SDK key (empty uses demo test key)");
         _maxSdkKeyInput = CreateFlatTmpInput(parent,
             "Optional: paste your SDK key",
-            PlayerPrefs.GetString(PrefMaxSdkKey, ""),
+            PrefOrConfigFallback(PrefMaxSdkKey, BidscubeDemoRuntimeConfig.ApplovinSdkKey),
             preferredHeight: 54f);
         WireMaxPrefsOnEndEdit(_maxSdkKeyInput, PrefMaxSdkKey);
 
         AddTmpMaxFieldCaption(parent, "Banner ad unit ID");
         _maxBannerAdUnitInput = CreateFlatTmpInput(parent,
             "Optional: empty uses Enterprise Demo fallback",
-            PlayerPrefs.GetString(PrefMaxAdBanner, ""),
+            PrefOrConfigFallback(PrefMaxAdBanner, BidscubeDemoRuntimeConfig.ApplovinBannerAdUnitId),
             preferredHeight: 52f);
         WireMaxAdUnitFieldEndEdit(_maxBannerAdUnitInput, PrefMaxAdBanner);
 
         AddTmpMaxFieldCaption(parent, "Video ad unit ID (rewarded)");
         _maxVideoAdUnitInput = CreateFlatTmpInput(parent,
             "Optional: empty uses Enterprise Demo fallback",
-            PlayerPrefs.GetString(PrefMaxAdVideo, ""),
+            PrefOrConfigFallback(PrefMaxAdVideo, BidscubeDemoRuntimeConfig.ApplovinRewardedAdUnitId),
             preferredHeight: 52f);
         WireMaxAdUnitFieldEndEdit(_maxVideoAdUnitInput, PrefMaxAdVideo);
 
@@ -85,6 +86,8 @@ public partial class SdkLaunchHub
         BidscubeSDK.BidscubeSDK.ClearAdViewsParentTransform();
         _mainBlock.SetActive(false);
         _directBlock.SetActive(false);
+        if (_levelPlayBlock != null)
+            _levelPlayBlock.SetActive(false);
         if (_maxBlock != null)
             _maxBlock.SetActive(true);
         RefreshMaxPanelAdActions();
@@ -134,7 +137,10 @@ public partial class SdkLaunchHub
                 $"{AppLovinLog} SDK key field empty — using AppLovin Android demo sample key for test builds (same as GlobalApplication.kt). " +
                 "Paste your MAX dashboard key above for production.");
 
+        // AppLovin marks SetSdkKey obsolete in favor of Integration Manager; test app still sets runtime key for launcher QA.
+#pragma warning disable CS0618
         MaxSdk.SetSdkKey(sdkKeyEffective);
+#pragma warning restore CS0618
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
         MaxSdk.SetVerboseLogging(true);
@@ -377,7 +383,7 @@ public partial class SdkLaunchHub
             return true;
         if (adUnitId.IndexOf("ENTER_ANDROID_", StringComparison.OrdinalIgnoreCase) >= 0)
             return true;
-        if (adUnitId.IndexOf("ENTER_IOS_", StringComparison.OrdinalIgnoreCase) >= 0)
+        if (adUnitId.IndexOf("YOUR_APPLOVIN", StringComparison.OrdinalIgnoreCase) >= 0)
             return true;
         return false;
     }
@@ -479,3 +485,4 @@ public partial class SdkLaunchHub
         SceneManager.LoadScene(AppLovinDemoSceneName);
     }
 }
+#endif

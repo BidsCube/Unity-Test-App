@@ -1,7 +1,22 @@
 {
   "bidscube": {
-    "bannerPlacementId": "20212",
-    "videoPlacementId": "20213",
-    "nativePlacementId": "20214"
+    "baseUrl": "https://YOUR_BIDSCUBE_API_HOST/",
+    "appKey": "YOUR_BIDSCUBE_APP_KEY",
+    "publisherId": "YOUR_PUBLISHER_ID",
+    "placements": {
+      "banner": "YOUR_BANNER_PLACEMENT_ID",
+      "video": "YOUR_VIDEO_PLACEMENT_ID",
+      "native": "YOUR_NATIVE_PLACEMENT_ID"
+    }
+  },
+  "applovin": {
+    "sdkKey": "YOUR_APPLOVIN_SDK_KEY",
+    "bannerAdUnitId": "YOUR_APPLOVIN_BANNER_AD_UNIT_ID",
+    "rewardedAdUnitId": "YOUR_APPLOVIN_REWARDED_AD_UNIT_ID"
+  },
+  "levelplay": {
+    "appKey": "YOUR_LEVELPLAY_APP_KEY",
+    "bannerAdUnitId": "YOUR_LEVELPLAY_BANNER_AD_UNIT_ID",
+    "rewardedAdUnitId": "YOUR_LEVELPLAY_REWARDED_AD_UNIT_ID"
   }
 }

@@ -1,0 +1,32 @@
+name: Publisher demo validation
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  hygiene-and-manifests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Repository hygiene + manifest pins
+        run: bash tools/verify-publisher-demo-ready.sh
+
+      - name: Validate Package Manager manifests (JSON)
+        run: |
+          set -euo pipefail
+          for j in Packages/manifest.json Packages/manifest.direct.json Packages/manifest.applovin.json Packages/manifest.levelplay.json; do
+            python3 -c "import json; json.load(open('$j'))"
+            echo "OK: $j"
+          done
+
+      - name: Fail on tracked binary artifacts (spot check)
+        run: |
+          set -euo pipefail
+          if git ls-files | grep -E '\.(apk|aab|ipa|obb)$' | grep -q .; then
+            echo "Tracked mobile build artifacts:"
+            git ls-files | grep -E '\.(apk|aab|ipa|obb)$' || true
+            exit 1
+          fi
+          echo "OK: no tracked apk/aab/ipa/obb."

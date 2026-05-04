@@ -1,180 +1,167 @@
-# BidsCube Unity test app — how it works
+# BidsCube Unity Publisher Demo — technical documentation
 
-This repository is a **Unity integration playground** for the BidsCube SDK (`com.bidscube.sdk`) alongside **AppLovin MAX** (`com.applovin.mediation.ads`) and the **BidsCube MAX adapter** (`com.bidscube.applovin.max`). It is not a production game; it exists to exercise APIs, placements, and mediation from one entry point.
+This repository is a **publisher-facing reference Unity project**. It is **not** a production game. It exists so integrators can open one small tree, pick a **demo profile**, and see **Direct BidsCube SDK**, **AppLovin MAX**, or **Unity LevelPlay** working from a single entry scene.
 
-### Demo video (optional)
-
-Screen captures for reviewers should **not** bloat git by default (root `*.mp4` / `*.apk` are **gitignored**). Options:
-
-| Approach | Notes |
-|---------|--------|
-| **GitHub Release** | Attach `video_2026-04-29_09-57-50.mp4` (or similar) to a release. |
-| **README inline player** | On github.com, **Edit** `README.md` and **drag-and-drop** the MP4 into the editor; GitHub inserts a `user-attachments` / `user-images` URL that renders as a player. Plain `<video>` or `raw.githubusercontent.com` links in Markdown usually **do not** embed on the repo home page. |
-| **Local only** | Keep the file on disk; it stays out of commits if matched by `.gitignore`. |
-
-Unity never imports this file into builds.
+**Unity-Test-App validates released packages.** It must **not** contain duplicated AARs, copied SDK sources, or manual Gradle dependencies added only to paper over packaging gaps. **Packaging and native wiring belong in the official BidsCube, AppLovin, and LevelPlay UPM packages** (and their EDM/Gradle integration). This demo stays **source-only** and avoids hiding package issues with local workarounds.
 
 ---
 
-## Repository hygiene (QA app)
+## Architecture
 
-Keep the repo **source-only** so clones stay fast and reviewers see a clean reference tree.
+| Layer | Role |
+| --- | --- |
+| **`Packages/manifest.*.json`** | Declares which SDKs are installed for a given profile (`direct`, `applovin`, `levelplay`). |
+| **`tools/use-demo-profile.sh`** | Copies one profile manifest to `Packages/manifest.json` and deletes `packages-lock.json` so Unity performs a clean resolve. |
+| **`Assets/Editor/BidscubePublisherDemoDefines.cs`** | Reads `Packages/manifest.json` and sets **`BIDSCUBE_HAS_APPLOVIN`** / **`BIDSCUBE_HAS_LEVELPLAY`** scripting define symbols so optional mediation code **does not compile** when those packages are absent. |
+| **`SdkLaunchHub`** (partials) | Builds the runtime launcher UI: **Direct SDK** always; **AppLovin** and **LevelPlay** panels only when the corresponding define exists. |
+| **`Assets/Resources/BidscubeDemoConfig.json`** | JSON placeholders for BidsCube, AppLovin, and LevelPlay IDs (no production secrets in git). |
+| **`BidscubeDemoRuntimeConfig`** | Loads the JSON at runtime for defaults and UI seed values. |
+| **`TestIntegration`** | Thin Direct SDK sample: `SDKConfig`, `Initialize`, `IAdCallback` logging, ad APIs. |
 
-| Do commit | Do **not** commit (see `.gitignore`) |
-|-----------|--------------------------------------|
-| `Assets/`, `Packages/manifest.json`, `ProjectSettings/`, `README.md`, `DOCUMENTATION.md` | `Library/`, `Temp/`, `Logs/`, `UserSettings/`, `obj/`, `Build/`, `Builds/` |
-| | `*.csproj`, `*.sln`, `*.apk`, `*.aab`, `*_BurstDebugInformation_DoNotShip/` |
-| | Root `*.mp4` / `*.mov` (use Releases or README CDN upload) |
-
-If you change **`Packages/manifest.json`**, open the project in Unity once so **`Packages/packages-lock.json`** is regenerated.
-
-CI: `.github/workflows/repo-hygiene.yml` fails the build if APK/AAB files are tracked in git.
-
-### Android / Unity build (full CI)
-
-A **compiled Android check** needs a Unity license (e.g. `UNITY_LICENSE` secret) and a workflow based on [GameCI](https://game.ci/) or an internal builder. That is intentionally **not** wired here so forks do not fail on missing secrets; add it when the org is ready.
+Entry point: **`Assets/Sample scene.unity`** (index `0` in **Build Settings**). `SdkLaunchHub` is attached to the Canvas and builds the hub in `Awake`.
 
 ---
 
-## Where you start
+## Package ownership
 
-| Item | Location |
-|------|----------|
-| **First scene in build** | `Assets/Sample scene.unity` (index `0` in `ProjectSettings/EditorBuildSettings.asset`) |
-| **Hub component** | `SdkLaunchHub` on that scene — builds the full launcher UI at runtime (TMP + uGUI) |
+| Concern | Owner |
+| --- | |
+| `com.bidscube.sdk` | BidsCube Unity SDK repository |
+| `com.bidscube.applovin.max` | BidsCube AppLovin adapter package |
+| `com.bidscube.levelplay` | BidsCube LevelPlay adapter package |
+| `com.applovin.mediation.ads` | AppLovin (scoped registry) |
+| `com.unity.services.levelplay` | Unity |
+| Android Resolver / EDM graphs | Driven by the packages above; do not fork their dependency XML into this demo as a “fix” |
 
-The hub offers two paths:
-
-1. **Direct SDK** — C# calls into `BidscubeSDK.BidscubeSDK` (banner, video, native) with demo placements.
-2. **AppLovin MAX** — init MAX from the panel, show/hide banner and rewarded video, open the AppLovin demo scene, or use the Mediation Debugger.
-
-Other scenes (`Bidscube Example Scene`, `SDK Test Scene`, etc.) are additional samples included in the build; you can open them from the Editor or extend the hub.
-
----
-
-## UPM dependencies (what talks to what)
-
-Defined in `Packages/manifest.json` (versions change over time; always check the file). The manifest is kept **lean for this QA app**: ads SDKs, **Universal RP** (project renders with URP), **Input System**, **TMP**, **uGUI**, **Visual Studio** integration, and core Unity **modules** URP/WebRequest rely on. Optional template packages (2D, Timeline, Visual Scripting, Collab, Multiplayer Center, Rider, Test Framework) were removed to shrink the dependency surface — add them back only if you extend scenes that need them.
-
-After editing the manifest, open the project once so Unity writes **`packages-lock.json`**.
-
-| Package | Role |
-|---------|------|
-| `com.bidscube.sdk` (Git) | BidsCube Unity SDK — `Initialize`, `Show*Ad`, layout hooks, cleanup. |
-| `com.bidscube.applovin.max` (Git) | Bridges BidsCube ads into the MAX stack for the adapter workflow. |
-| `com.applovin.mediation.ads` | Official AppLovin MAX Unity package (from AppLovin scoped registry). |
-| `com.google.external-dependency-manager` | Resolves Android/iOS native dependencies (EDM4U). |
-
-Native Android MAX SDK and Gradle setup are driven by the AppLovin Unity plugin and your custom templates under `Assets/Plugins/Android` where applicable.
+If Android resolution fails, fix or upgrade the **package** or document the official workaround in the **adapter/SDK repo**, not by vendoring AARs into this sample.
 
 ---
 
-## Direct SDK path (BidsCube C# APIs)
+## Demo profiles
 
-### Main scripts
+| File | Contents |
+| --- | --- |
+| `Packages/manifest.direct.json` | `com.bidscube.sdk` **v1.2.5** only (+ core Unity modules). |
+| `Packages/manifest.applovin.json` | Direct SDK + **`com.bidscube.applovin.max` v1.0.14** + **`com.applovin.mediation.ads`** + EDM. |
+| `Packages/manifest.levelplay.json` | Direct SDK + **`com.bidscube.levelplay` v1.0.3** + **`com.unity.services.levelplay` 9.4.1** + EDM. |
+| `Packages/manifest.json` | **Default clone state = AppLovin profile** (copy of `manifest.applovin.json`). |
 
-| File | Responsibility |
-|------|----------------|
-| `Assets/BidscubeEmbeddedDemo/SdkLaunchHub.cs` | Hub state, **Direct SDK** panel layout, routing, dock wiring. |
-| `SdkLaunchHub.Ui.cs` | Partial: shared TMP/uGUI builders (buttons, inputs, panels). |
-| `SdkLaunchHub.MaxIntegration.cs` | Partial: MAX panel, init, diagnostics, Mediation Debugger entry. |
-| `SdkLaunchDirectTitleDrag.cs` | Draggable Direct SDK card title. |
-| `Assets/TestIntegration/TestIntegration.cs` | Thin wrapper: `SDKConfig`, `Initialize`, ad calls, `IAdCallback` logging. |
-| `BidscubeDemoRuntimeConfig.cs` | Loads `Resources/BidscubeDemoConfig.json` placement defaults. |
+Conditional compilation:
 
-### Lifecycle (important)
-
-- On startup the hub calls `BidscubeSDK.SetInitializationEnabled(false)` and `Cleanup()` so nothing initializes until the user chooses a path (`SdkLaunchHub.Awake`).
-- **Direct SDK**: tapping **Initialize SDK** enables init (`SetInitializationEnabled(true)`), then `TestIntegration.InitializeSdkFromUi()` runs the same builder-based setup as a standalone test.
-- Leaving the Direct panel (`HideDirectPanel`) clears ad parents, cleans up, and disables initialization again so the next visit is a clean slate.
-
-### Placements (configurable demo IDs)
-
-Defaults live in **`Assets/Resources/BidscubeDemoConfig.json`** (loaded at runtime by `BidscubeDemoRuntimeConfig`). Edit JSON to point at your BidsCube environment without recompiling.
-
-`TestIntegration` exposes **`PlacementBanner`**, **`PlacementVideo`**, **`PlacementNative`** as static properties backed by that file (fallbacks: `20212` / `20213` / `20214` if the asset is missing).
-
-These IDs must exist and be valid for your BidsCube project.
-
-### Dock / in-panel ads
-
-When you use **Banner**, **Native**, or **Video** from the Direct panel:
-
-- The **dock** (`DirectAdDock`) can be shown so previews appear inside the white panel instead of only full-screen overlays.
-- `SdkLaunchHub` calls `BidscubeSDK.SetAdViewsParentTransform(_directAdSlotTransform, true)` so new ad views parent under the gray **DirectAdSlot** RectTransform.
-- Layout is nudged after a frame via `ReapplyLayoutForAllActiveAds()` so the Unity Layout system and the SDK stay in sync.
-
-**Clear all ads** removes creatives, hides the dock, and clears the parent transform override.
+- **`#if BIDSCUBE_HAS_APPLOVIN`** wraps `SdkLaunchHub.MaxIntegration.cs`, MAX-only fields, and menu entries.
+- **`#if BIDSCUBE_HAS_LEVELPLAY`** wraps `SdkLaunchHub.LevelPlayIntegration.cs`, `LevelPlayDemoDefaults.cs`, and LevelPlay menu entries.
 
 ---
 
-## AppLovin MAX path
+## Direct SDK flow
 
-### Main pieces
+1. Hub starts with BidsCube init **disabled** and calls **`Cleanup()`** so nothing runs until the user picks a path.
+2. **Direct SDK** → **Initialize SDK** enables init and calls **`TestIntegration.InitializeSdkFromUi()`**.
+3. Base URL: Inspector **`baseURL`** on `TestIntegration` overrides; if empty, **`BidscubeDemoRuntimeConfig.BaseUrl`** from JSON is used.
+4. Placements come from **`BidscubeDemoRuntimeConfig`** (loaded from **`BidscubeDemoConfig.json`**).
+5. Leaving the Direct panel clears ad parent overrides and disables init again for a clean slate.
 
-| File | Responsibility |
-|------|----------------|
-| `SdkLaunchHub` (partial) | SDK key and ad unit fields (stored in **PlayerPrefs** for this test app only), **Reset MAX demo prefs (QA)**, Initialize MAX, banner / rewarded, demo scene, Mediation Debugger. |
-| `Assets/BidscubeEmbeddedDemo/MaxEnterpriseDemoDefaults.cs` | Fallback **application ID** and **banner / rewarded ad unit IDs** aligned with AppLovin’s enterprise demo app package. Used when fields are empty or still placeholders. |
-| `Assets/BidscubeEmbeddedDemo/AppLovinMaxBannerTeardown.cs` | Ensures MAX banner views are torn down when switching scenes (MAX banner can outlive “hide” as a native overlay). |
-
-### Flow
-
-1. User opens **AppLovin MAX** from the main menu.
-2. Optional: paste real **SDK key** and **ad unit** strings; otherwise the launcher uses the demo key pattern documented in code and fallbacks from `MaxEnterpriseDemoDefaults`.
-3. **Initialize MAX** registers callbacks and loads ads per MAX’s API.
-4. **Show banner / Hide banner / Play video ad** call the corresponding MAX APIs.
-5. **Open MAX demo scene** loads `Bidscube Example Scene` (see build settings).
-
-Status text at the bottom of the MAX panel shows **“QA: … fallback … (NOT production)”** when AppLovin **Enterprise Demo** fallback ad units from `MaxEnterpriseDemoDefaults` apply. Use **Reset MAX demo prefs (QA)** to clear saved keys/units and return to that demo state.
+Log prefix: **`[Direct SDK]`**.
 
 ---
 
-## Returning to the hub from any scene
+## AppLovin MAX flow
 
-`Assets/BidscubeEmbeddedDemo/LauncherReturnBootstrap.cs` registers `SceneManager.sceneLoaded` and, for every scene **except** build index `0`, spawns a small **Back** overlay (`LauncherReturnToHubUi` — IMGUI + Escape). That way you do not have to edit each sample scene to add a return button.
+1. Available only when **`BIDSCUBE_HAS_APPLOVIN`** is set (AppLovin / BidsCube MAX packages present in manifest).
+2. Panel fields use **PlayerPrefs** first; empty or placeholder values fall back to **`MaxEnterpriseDemoDefaults`** or **`BidscubeDemoRuntimeConfig`** as documented in code.
+3. **Mediation Debugger** and MAX sample scene entry points live in the MAX partial.
+4. **Banner teardown** on scene changes: `AppLovinMaxBannerTeardown`.
 
-When leaving a non-hub scene, it also calls **AppLovin MAX banner teardown** so a banner does not follow you into the next scene.
-
----
-
-## Logging
-
-- **Direct SDK** lines are prefixed with `[Direct SDK]` (from `TestIntegration` and relevant `SdkLaunchHub` paths).
-- **AppLovin** lines use `[AppLovin SDK]`.
-- `TestIntegration` implements `IAdCallback` and logs load, display, click, close, failures, and video lifecycle for verification.
+Log prefix: **`[AppLovin SDK]`** (and MAX / network logs as usual).
 
 ---
 
-## Quick file map
+## LevelPlay flow
+
+1. Available only when **`BIDSCUBE_HAS_LEVELPLAY`** is set.
+2. Uses **Unity LevelPlay** APIs under `Unity.Services.LevelPlay` (see `SdkLaunchHub.LevelPlayIntegration.cs`).
+3. Demo fallbacks: **`LevelPlayDemoDefaults`** (ironSource sample-style keys documented in that file) apply when input looks like **`YOUR_*`** placeholders.
+
+Log prefix: **`[LevelPlay SDK]`**.
+
+---
+
+## Android build flow
+
+1. Select **Android** in **Build Settings**.
+2. For **applovin** / **levelplay** profiles: **Assets → External Dependency Manager → Android Resolver** (or **Force Resolve**).
+3. Build **APK/AAB** locally; outputs stay **untracked** (see `.gitignore`).
+4. Do not add **manual `implementation '...'` lines** to `mainTemplate.gradle` in this repo to “fix” mediation unless Unity/AppLovin/LevelPlay docs require a **documented** project-level hook — prefer fixing upstream packages.
+
+---
+
+## iOS build flow
+
+1. Install pods / resolve as required by AppLovin MAX and LevelPlay packages for your profile.
+2. Configure **signing**, **bundle ID**, and **Info.plist** entries per each vendor’s current documentation.
+3. BidsCube + mediators must be allowed to load network creatives; use **test devices** and **test mode** while integrating.
+
+---
+
+## Troubleshooting
+
+| Symptom | What to check |
+| --- | --- |
+| Scripts error on **Direct** profile | Ensure you ran `./tools/use-demo-profile.sh direct` and let Unity recompile; MAX/LevelPlay usings must be excluded (defines off). |
+| **MAX** symbols missing | Confirm `manifest.json` lists `com.applovin.mediation.ads` / `com.bidscube.applovin.max`; re-open project or trigger `BidscubePublisherDemoDefines` (manifest edit). |
+| **LevelPlay** types missing | Same for `com.unity.services.levelplay` / `com.bidscube.levelplay`. |
+| **Duplicate class** / Dex merger errors | Usually two versions of the same Android artifact; resolve with EDM and **one** stack of package versions — do not add duplicate AARs here. |
+| Ads never load (1035 / no fill) | **Placeholder keys**, geo, **test mode**, and dashboard **placements / ad units** must match the running bundle ID / package name. |
+| **UnitySendMessage** errors | JNI bridge not loaded or wrong activity lifecycle — compare with official mediation SDK setup for your Unity version. |
+
+Search logs for: **Bidscube**, **BidsCube**, **AppLovin**, **MAX**, **LevelPlay**, **ironSource**, **duplicate class**, **UnitySendMessage**.
+
+---
+
+## File map
 
 ```
-Assets/Resources/BidscubeDemoConfig.json   # Direct SDK placement IDs (JSON)
-DOCUMENTATION.md
 README.md
+DOCUMENTATION.md
+PUBLISHER_GUIDE.md
+RELEASE_CHECKLIST.md
+tools/
+  use-demo-profile.sh
+  verify-publisher-demo-ready.sh
+Packages/
+  manifest.json                 # active profile (default: applovin)
+  manifest.direct.json
+  manifest.applovin.json
+  manifest.levelplay.json
 Assets/
+  Editor/
+    BidscubePublisherDemoDefines.cs
+  Resources/
+    BidscubeDemoConfig.json
   BidscubeEmbeddedDemo/
     SdkLaunchHub.cs
     SdkLaunchHub.Ui.cs
     SdkLaunchHub.MaxIntegration.cs
+    SdkLaunchHub.LevelPlayIntegration.cs
     SdkLaunchDirectTitleDrag.cs
     BidscubeDemoRuntimeConfig.cs
     LauncherReturnBootstrap.cs
     MaxEnterpriseDemoDefaults.cs
+    LevelPlayDemoDefaults.cs
     AppLovinMaxBannerTeardown.cs
   TestIntegration/
     TestIntegration.cs
   Sample scene.unity
-  Scenes/
-Packages/manifest.json    # Unity regenerates packages-lock.json on resolve
 .github/workflows/
+  publisher-demo.yml
 ```
 
 ---
 
-## Platform notes
+## Repository hygiene
 
-- **Android / device**: Full paths (GAID helpers, MAX, WebView-based ads) are meaningful here.
-- **Unity Editor**: Many ad stacks show limited or placeholder behavior; use logs and on-device builds for real validation.
+**Commit:** `Assets/`, `Packages/manifest*.json` (profiles + active manifest), `ProjectSettings/`, docs, `.gitignore`, `tools/`, `.github/`.
 
-If something “works in Editor but not on device” (or the reverse), compare **package name**, **placement IDs**, **MAX ad units**, and **network / consent** configuration first — this test app does not replace dashboard setup for your own apps.
+**Do not commit:** `Library/`, `Temp/`, `Logs/`, `UserSettings/`, `obj/`, build output folders, `*.apk` / `*.aab` / `*.ipa`, root `*.mp4` / `*.mov`, `*_BurstDebugInformation_DoNotShip/`, generated `*.csproj` / `*.sln`, or **`Packages/packages-lock.json`** for this demo (unless deliberately freezing a profile).
+
+CI runs **`tools/verify-publisher-demo-ready.sh`** — keep it green before tagging releases.

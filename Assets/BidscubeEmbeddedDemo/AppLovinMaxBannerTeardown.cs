@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 
+#if BIDSCUBE_HAS_APPLOVIN
 /// <summary>
 /// <see cref="MaxSdk.HideBanner"/> leaves the native MAX banner alive; on scene change it can still paint on the next view.
 /// Call <see cref="TeardownCurrentBannerIfInitialized"/> when leaving the launcher hub or closing the MAX flow so the overlay is destroyed.
@@ -54,3 +55,4 @@ public static class AppLovinMaxBannerTeardown
         return false;
     }
 }
+#endif

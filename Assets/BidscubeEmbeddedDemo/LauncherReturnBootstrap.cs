@@ -44,8 +44,10 @@ public static class LauncherReturnBootstrap
                 return;
         }
 
+#if BIDSCUBE_HAS_APPLOVIN
         // MAX banner is native overlay — Hide alone can leave the view; destroy so it does not follow onto this scene.
         AppLovinMaxBannerTeardown.TeardownCurrentBannerIfInitialized();
+#endif
 
         var go = new GameObject(OverlayRootName);
         SceneManager.MoveGameObjectToScene(go, scene);
@@ -89,7 +91,9 @@ public sealed class LauncherReturnToHubUi : MonoBehaviour
             return;
 
         // Hub owns SDK lifecycle; shut down any initialized state before returning.
+#if BIDSCUBE_HAS_APPLOVIN
         AppLovinMaxBannerTeardown.TeardownCurrentBannerIfInitialized();
+#endif
         BidscubeSDK.BidscubeSDK.ClearAdViewsParentTransform();
         BidscubeSDK.BidscubeSDK.Cleanup();
         BidscubeSDK.BidscubeSDK.SetInitializationEnabled(false);

@@ -5,8 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// Launcher styled like <c>SDK Test Scene</c> (TMP + primary blue buttons). Main menu routes to:
-/// Direct SDK panel (explicit Initialize + ad actions) or AppLovin MAX demo scene.
+/// Launcher entry: runtime hub for Direct SDK and optional mediation adapters (see demo profiles in /Packages).
 /// </summary>
 public partial class SdkLaunchHub : MonoBehaviour
 {
@@ -87,11 +86,21 @@ public partial class SdkLaunchHub : MonoBehaviour
         BuildDirectPanel(_directBlock.transform);
         _directBlock.SetActive(false);
 
+#if BIDSCUBE_HAS_APPLOVIN
         _maxBlock = BuildWhiteContentBlock(backdrop.transform, "AppLovinMaxPanel");
         BuildMaxPanel(_maxBlock.transform);
         _maxBlock.SetActive(false);
+#else
+        _maxBlock = null;
+#endif
 
+#if BIDSCUBE_HAS_LEVELPLAY
+        _levelPlayBlock = BuildWhiteContentBlock(backdrop.transform, "LevelPlayPanel");
+        BuildLevelPlayPanel(_levelPlayBlock.transform);
+        _levelPlayBlock.SetActive(false);
+#else
         _levelPlayBlock = null;
+#endif
     }
 
     void BuildMainMenu(Transform parent)
@@ -99,16 +108,22 @@ public partial class SdkLaunchHub : MonoBehaviour
         var v = parent.gameObject.AddComponent<VerticalLayoutGroup>();
         ApplyDirectPanelPageLayout(v);
 
-        AddTmpTitle(parent, "Bidscube SDK", 28f, FontStyles.Bold, TextAlignmentOptions.Center);
+        AddTmpTitle(parent, "BidsCube Unity Publisher Demo", 28f, FontStyles.Bold, TextAlignmentOptions.Center);
         AddTmpBody(
             parent,
-            "UPM <c>com.bidscube.sdk</c>. Pick an integration path - same panel layout and typography as Direct SDK.",
+            "Reference project for <c>com.bidscube.sdk</c> with optional AppLovin MAX and Unity LevelPlay mediation (switch package profile via <c>tools/use-demo-profile.sh</c>). Edit <c>Assets/Resources/BidscubeDemoConfig.json</c> with your dashboard placeholders only.",
             18f,
-            LauncherBodyText);
+            LauncherBodyText,
+            96f);
 
         AddSpacer(parent, 4f);
         AddSdkStylePrimaryButton(parent, "1 · Direct SDK (C# APIs)", ShowDirectPanel);
-        AddSdkStylePrimaryButton(parent, "2 · AppLovin MAX", ShowMaxPanel);
+#if BIDSCUBE_HAS_APPLOVIN
+        AddSdkStylePrimaryButton(parent, "2 · AppLovin MAX (mediation)", ShowMaxPanel);
+#endif
+#if BIDSCUBE_HAS_LEVELPLAY
+        AddSdkStylePrimaryButton(parent, "3 · LevelPlay (Unity mediation)", ShowLevelPlayPanel);
+#endif
     }
 
     void BuildDirectPanel(Transform parent)
@@ -273,7 +288,12 @@ public partial class SdkLaunchHub : MonoBehaviour
 
     void OnDestroy()
     {
+#if BIDSCUBE_HAS_APPLOVIN
         UnhookMaxDiagnosticCallbacks();
+#endif
+#if BIDSCUBE_HAS_LEVELPLAY
+        ReleaseLevelPlayInitCallbacks();
+#endif
         BidscubeSDK.BidscubeSDK.ClearAdViewsParentTransform();
         DisableSdksForMenu();
     }
@@ -314,11 +334,6 @@ public partial class SdkLaunchHub : MonoBehaviour
             BidscubeSDK.BidscubeSDK.SetAdViewsParentTransform(_directAdSlotTransform, true);
     }
 
-    void BuildLevelPlayPanel(Transform parent)
-    {
-        // Removed (no Level Play in this launcher build).
-    }
-
     void ShowDirectPanel()
     {
         DisableSdksForMenu();
@@ -347,13 +362,15 @@ public partial class SdkLaunchHub : MonoBehaviour
         DisableSdksForMenu();
     }
 
-    void ShowLevelPlayPanel()
+    /// <summary>PlayerPrefs override first; otherwise value from <see cref="BidscubeDemoRuntimeConfig"/>.</summary>
+    static string PrefOrConfigFallback(string prefKey, string configPlaceholder)
     {
-        // Removed (no Level Play in this launcher build).
-    }
-
-    void HideLevelPlayPanel()
-    {
-        // Removed (no Level Play in this launcher build).
+        if (PlayerPrefs.HasKey(prefKey))
+        {
+            var v = PlayerPrefs.GetString(prefKey);
+            if (!string.IsNullOrEmpty(v))
+                return v;
+        }
+        return configPlaceholder ?? "";
     }
 }

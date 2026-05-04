@@ -57,8 +57,11 @@ public class TestIntegration : MonoBehaviour, IAdCallback
             .DefaultAdTimeout(defaultAdTimeoutMs)
             .DefaultAdPosition(defaultAdPosition);
 
-        if (!string.IsNullOrWhiteSpace(baseURL))
-            builder.BaseURL(baseURL.Trim());
+        var effectiveBaseUrl = !string.IsNullOrWhiteSpace(baseURL)
+            ? baseURL.Trim()
+            : BidscubeDemoRuntimeConfig.BaseUrl;
+        if (!string.IsNullOrWhiteSpace(effectiveBaseUrl))
+            builder.BaseURL(effectiveBaseUrl);
 
         var config = builder.Build();
 
