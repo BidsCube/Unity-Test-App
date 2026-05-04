@@ -31,7 +31,9 @@
     {
       "name": "AppLovin",
       "url": "https://unity.packages.applovin.com/",
-      "scopes": ["com.applovin"]
+      "scopes": [
+        "com.applovin"
+      ]
     }
   ]
 }

@@ -10,16 +10,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Validate demo manifest profiles
+        run: bash tools/verify-demo-profiles.sh
+
       - name: Repository hygiene + manifest pins
         run: bash tools/verify-publisher-demo-ready.sh
-
-      - name: Validate Package Manager manifests (JSON)
-        run: |
-          set -euo pipefail
-          for j in Packages/manifest.json Packages/manifest.direct.json Packages/manifest.applovin.json Packages/manifest.levelplay.json; do
-            python3 -c "import json; json.load(open('$j'))"
-            echo "OK: $j"
-          done
 
       - name: Fail on tracked binary artifacts (spot check)
         run: |

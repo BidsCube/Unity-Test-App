@@ -11,7 +11,8 @@ This repository is a **publisher-facing reference Unity project**. It is **not**
 | Layer | Role |
 | --- | --- |
 | **`Packages/manifest.*.json`** | Declares which SDKs are installed for a given profile (`direct`, `applovin`, `levelplay`). |
-| **`tools/use-demo-profile.sh`** | Copies one profile manifest to `Packages/manifest.json` and deletes `packages-lock.json` so Unity performs a clean resolve. |
+| **`tools/use-demo-profile.sh`** / **`use-demo-profile.ps1`** | Copies one profile manifest to `Packages/manifest.json` and deletes `packages-lock.json` so Unity performs a clean resolve. |
+| **`tools/verify-demo-profiles.sh`** | Validates JSON and required Git pins in all profile manifests (`bidscube-sdk-unity` tag, adapters, AppLovin registry). |
 | **`Assets/Editor/BidscubePublisherDemoDefines.cs`** | Reads `Packages/manifest.json` and sets **`BIDSCUBE_HAS_APPLOVIN`** / **`BIDSCUBE_HAS_LEVELPLAY`** scripting define symbols so optional mediation code **does not compile** when those packages are absent. |
 | **`SdkLaunchHub`** (partials) | Builds the runtime launcher UI: **Direct SDK** always; **AppLovin** and **LevelPlay** panels only when the corresponding define exists. |
 | **`Assets/Resources/BidscubeDemoConfig.json`** | JSON placeholders for BidsCube, AppLovin, and LevelPlay IDs (no production secrets in git). |
@@ -128,6 +129,8 @@ PUBLISHER_GUIDE.md
 RELEASE_CHECKLIST.md
 tools/
   use-demo-profile.sh
+  use-demo-profile.ps1
+  verify-demo-profiles.sh
   verify-publisher-demo-ready.sh
 Packages/
   manifest.json                 # active profile (default: applovin)
@@ -165,4 +168,4 @@ Assets/
 
 **Do not commit:** `Library/`, `Temp/`, `Logs/`, `UserSettings/`, `obj/`, build output folders, `*.apk` / `*.aab` / `*.ipa`, root `*.mp4` / `*.mov`, `*_BurstDebugInformation_DoNotShip/`, generated `*.csproj` / `*.sln`, or **`Packages/packages-lock.json`** for this demo (unless deliberately freezing a profile).
 
-CI runs **`tools/verify-publisher-demo-ready.sh`** — keep it green before tagging releases.
+CI runs **`tools/verify-demo-profiles.sh`** and **`tools/verify-publisher-demo-ready.sh`** — keep them green before tagging releases.

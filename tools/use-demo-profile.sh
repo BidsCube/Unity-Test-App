@@ -1,37 +1,33 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 PROFILE="${1:-}"
 
-usage() {
-  echo "Usage: $0 direct|applovin|levelplay"
-  exit 1
-}
-
-[[ -n "$PROFILE" ]] || usage
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PACKAGES_DIR="$ROOT_DIR/Packages"
 
 case "$PROFILE" in
   direct)
-    cp "$ROOT/Packages/manifest.direct.json" "$ROOT/Packages/manifest.json"
+    cp "$PACKAGES_DIR/manifest.direct.json" "$PACKAGES_DIR/manifest.json"
     ;;
   applovin)
-    cp "$ROOT/Packages/manifest.applovin.json" "$ROOT/Packages/manifest.json"
+    cp "$PACKAGES_DIR/manifest.applovin.json" "$PACKAGES_DIR/manifest.json"
     ;;
   levelplay)
-    cp "$ROOT/Packages/manifest.levelplay.json" "$ROOT/Packages/manifest.json"
+    cp "$PACKAGES_DIR/manifest.levelplay.json" "$PACKAGES_DIR/manifest.json"
     ;;
   *)
-    usage
+    echo "Usage: $0 direct|applovin|levelplay"
+    exit 1
     ;;
 esac
 
-rm -f "$ROOT/Packages/packages-lock.json"
+rm -f "$PACKAGES_DIR/packages-lock.json"
 
-echo "Selected demo profile: $PROFILE"
+echo "Selected BidsCube demo profile: $PROFILE"
+echo ""
 echo "Next steps:"
-echo "  1. Open this folder in Unity."
-echo "  2. Wait for Package Manager to resolve dependencies."
-echo "  3. If you use Android: run External Dependency Manager > Android Resolver."
-echo "  4. Open Assets/Sample scene.unity and press Play."
-echo "  5. After packages change, let Unity refresh so Editor scripting defines update (BIDSCUBE_HAS_*)."
+echo "1. Open the project in Unity."
+echo "2. Wait until Package Manager resolves dependencies."
+echo "3. For AppLovin/LevelPlay, run External Dependency Manager Android Resolver if needed."
+echo "4. Open the sample scene and test the selected integration."

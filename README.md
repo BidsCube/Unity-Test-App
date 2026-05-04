@@ -6,6 +6,36 @@
 - BidsCube AppLovin MAX adapter with the official AppLovin MAX Unity SDK
 - BidsCube LevelPlay adapter with the official Unity LevelPlay (`com.unity.services.levelplay`) package
 
+## Choose demo profile
+
+Pick **one** profile **before** opening Unity (or after switching, let the editor resolve packages again).
+
+**macOS / Linux**
+
+```bash
+./tools/use-demo-profile.sh direct
+./tools/use-demo-profile.sh applovin
+./tools/use-demo-profile.sh levelplay
+```
+
+**Windows (PowerShell)**
+
+```powershell
+.\tools\use-demo-profile.ps1 -Profile direct
+.\tools\use-demo-profile.ps1 -Profile applovin
+.\tools\use-demo-profile.ps1 -Profile levelplay
+```
+
+Each command copies the matching manifest to **`Packages/manifest.json`** and removes **`packages-lock.json`** so Package Manager re-resolves.
+
+Validate profile JSON and pins locally:
+
+```bash
+bash tools/verify-demo-profiles.sh
+```
+
+The **default** committed **`Packages/manifest.json`** matches **`applovin`** (AppLovin MAX demo).
+
 ## Supported demo profiles
 
 | Profile | Packages | Purpose |
@@ -13,18 +43,6 @@
 | `direct` | `com.bidscube.sdk` | Direct SDK only |
 | `applovin` | `com.bidscube.sdk` + `com.bidscube.applovin.max` + official AppLovin MAX SDK | MAX mediation demo |
 | `levelplay` | `com.bidscube.sdk` + `com.bidscube.levelplay` + official Unity LevelPlay SDK | LevelPlay mediation demo |
-
-Switch profiles before opening Unity:
-
-```bash
-./tools/use-demo-profile.sh direct
-# or
-./tools/use-demo-profile.sh applovin
-# or
-./tools/use-demo-profile.sh levelplay
-```
-
-The default **`Packages/manifest.json`** in this repository matches the **`applovin`** profile (the sample scene already favours the Direct SDK + AppLovin launcher flow).
 
 ## Requirements
 
@@ -38,7 +56,7 @@ The default **`Packages/manifest.json`** in this repository matches the **`applo
 ## Quick start
 
 1. Clone this repository.
-2. Select a demo profile (see above).
+2. **Choose a demo profile** (see **[Choose demo profile](#choose-demo-profile)**) — default clone already uses **applovin**.
 3. Open the project in Unity and wait for **Package Manager** to resolve dependencies.
 4. Open **`Assets/Sample scene.unity`**.
 5. Edit **`Assets/Resources/BidscubeDemoConfig.json`** with your **placeholder-style** dashboard IDs only (see **[PUBLISHER_GUIDE.md](PUBLISHER_GUIDE.md)**).
@@ -83,6 +101,7 @@ More detail: **[DOCUMENTATION.md](DOCUMENTATION.md)** (Troubleshooting).
 ## Repository validation
 
 ```bash
+bash tools/verify-demo-profiles.sh
 bash tools/verify-publisher-demo-ready.sh
 ```
 
