@@ -1,25 +1,38 @@
-# BidsCube Unity test app (QA / SDK playground)
+# BidsCube Unity Test App — Publisher Demo
 
-Internal **demo app** for `com.bidscube.sdk`, **AppLovin MAX**, and `com.bidscube.applovin.max` — not a production game.
+**Локальні UPM-пакети (монорепо):** [docs/PACKAGE_SETUP.md](docs/PACKAGE_SETUP.md) — **`com.bidscube.*`** через **`file:../../…`** (база шляху — папка **`Packages/`** у Unity): `../../bidscube-sdk-unity`, `../../AppLovin-SDK-Unity`, `../../LevelPlay-SDK-for-BidsCube-Unity` поруч із каталогом проєкту. Офіційні репозиторії на GitHub — для релізів і зовнішніх інтеграторів.
 
-## Quick start
+**Очікувані версії в `package.json` локальних пакетів:** `com.bidscube.sdk` **v1.2.8**, `com.bidscube.applovin.max` **v1.0.19** (split Android AARs `bidscube-sdk-lite-no-video-1.2.4.aar` / `bidscube-sdk-full-video-1.2.4.aar` in the adapter package).
 
-| Step | Action |
-|------|--------|
-| Editor | **Unity 6** — this tree targets `6000.3.11f1` (see `ProjectSettings/ProjectVersion.txt`). |
-| Open | **`Assets/Sample scene.unity`** (first in build). |
-| Run | **`SdkLaunchHub`** builds the runtime launcher. Use **Direct SDK** or **AppLovin MAX**. |
+This project is a minimal Unity demo for testing BidsCube SDK integration with **Direct SDK**, **AppLovin MAX**, and **Unity LevelPlay**. Pick one path at a time using the profile scripts under `tools/`.
 
-**Placements:** defaults come from **`Assets/Resources/BidscubeDemoConfig.json`** (override without recompiling).  
-After changing **`Packages/manifest.json`**, open the project once so Unity regenerates **`Packages/packages-lock.json`**.
+## AppLovin MAX quick start
 
-## Flows
+1. Clone or open this repository.
+2. Switch to the AppLovin demo profile:
 
-1. **Direct SDK** — Initialize, then Banner / Video / Native (Bidscube C# API).  
-2. **AppLovin MAX** — Initialize MAX, banner / rewarded, Mediation Debugger, or open the MAX demo scene.
+```bash
+./tools/use-demo-profile.sh applovin
+```
 
-Details, file map, `link.xml`, and repository hygiene: **[DOCUMENTATION.md](DOCUMENTATION.md)**.
+3. Open the project in **Unity**.
+4. Wait until **Unity Package Manager** finishes resolving packages.
+5. Run **Assets → External Dependency Manager → Android Resolver → Force Resolve**.
+6. Open **`Assets/Sample scene.unity`**.
+7. In the demo UI, open **AppLovin MAX**.
+8. Enter your **AppLovin MAX SDK Key** and **Ad Unit IDs** (or use the JSON / on-screen flow described in **[PUBLISHER_GUIDE.md](PUBLISHER_GUIDE.md)**).
+9. **File → Build Settings → Android**, then build and run an **APK** on a device or emulator.
 
-## Android
+The default **AppLovin** checkout uses **LiteNoVideo** (`Assets/BidscubeAndroidExportSettings.asset`). Use **`./tools/use-demo-profile.sh applovin-video`** for **FullWithVideo** (video stack + launcher desugaring). See **[docs/internal/ANDROID_BUILD.md](docs/internal/ANDROID_BUILD.md)** for post-export Gradle grep checks.
 
-Build APK/AAB locally. Do **not** commit binaries to git (see `.gitignore`). Optional screen captures belong in **Releases** or GitHub **README** upload (see DOCUMENTATION).
+For build troubleshooting, see **[docs/internal/ANDROID_BUILD.md](docs/internal/ANDROID_BUILD.md)**.
+
+---
+
+## More help
+
+- **[docs/PACKAGE_SETUP.md](docs/PACKAGE_SETUP.md)** — `manifest.json`, профілі `use-demo-profile.sh`, локальні `file:` та (за потреби) Git URL.
+- **[PUBLISHER_GUIDE.md](PUBLISHER_GUIDE.md)** — Direct SDK, AppLovin MAX, and LevelPlay demos; where to enter keys and ad units; logs; Android build overview.
+- **Other profiles:** `./tools/use-demo-profile.sh direct`, **`applovin-lite`**, **`applovin-video`**, **`levelplay-lite`**, **`levelplay-video`** (or legacy **`applovin`** / **`levelplay`** aliases — run before opening Unity when switching).
+
+Maintainer / architecture notes: **[docs/internal/DOCUMENTATION.md](docs/internal/DOCUMENTATION.md)**.

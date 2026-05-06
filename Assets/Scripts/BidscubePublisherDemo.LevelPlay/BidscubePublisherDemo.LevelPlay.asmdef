@@ -1,0 +1,21 @@
+{
+    "name": "BidscubePublisherDemo.LevelPlay",
+    "references": [
+        "BidscubePublisherDemo",
+        "BidscubeSDK",
+        "Unity.LevelPlay",
+        "BidscubeLevelPlay"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "BIDSCUBE_DEMO_HAS_LEVELPLAY_ADAPTER",
+        "BIDSCUBE_DEMO_HAS_LEVELPLAY_SDK"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
