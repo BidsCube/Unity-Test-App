@@ -1,6 +1,6 @@
 # BidsCube Unity Publisher Demo — technical documentation
 
-Publisher-facing quick starts live in the root **[README.md](../README.md)** and **[PUBLISHER_GUIDE.md](../PUBLISHER_GUIDE.md)**. This file is **maintainer / architecture** detail for the **Unity-Test-App** repo.
+Publisher-facing quick starts live in the root **[README.md](../README.md)**, **[docs/PACKAGE_SETUP.md](../PACKAGE_SETUP.md)** (UPM / manifest snippets), and **[PUBLISHER_GUIDE.md](../PUBLISHER_GUIDE.md)**. This file is **maintainer / architecture** detail for the **Unity-Test-App** repo.
 
 **Unity-Test-App validates released packages.** It must **not** contain duplicated AARs, copied SDK sources, or manual Gradle dependencies added only to paper over packaging gaps. **Packaging and native wiring belong in the official BidsCube, AppLovin, and LevelPlay UPM packages** (and their EDM/Gradle integration). This demo stays **source-only** and avoids hiding package issues with local workarounds.
 
@@ -10,8 +10,8 @@ Publisher-facing quick starts live in the root **[README.md](../README.md)** and
 
 | Layer | Role |
 | --- | --- |
-| **`Packages/manifest.*.json`** | Declares which SDKs are installed for a given profile (`direct`, `applovin`, `levelplay`). |
-| **`tools/use-demo-profile.sh`** / **`use-demo-profile.ps1`** | Copies one profile manifest to `Packages/manifest.json` and deletes `packages-lock.json` so Unity performs a clean resolve. |
+| **`Packages/manifest.*.json`** | Declares which SDKs are installed for a given profile (`direct`, `applovin`, `applovin-lite`, `applovin-video`, `levelplay`, `levelplay-lite`, `levelplay-video`). |
+| **`tools/use-demo-profile.sh`** / **`use-demo-profile.ps1`** | Copies one profile manifest to `Packages/manifest.json`, deletes `packages-lock.json`, and sets **`Assets/BidscubeAndroidExportSettings.asset`** (`applovin-lite` / `levelplay-lite` → **LiteNoVideo**; `*-video` → **FullWithVideo**; `direct` removes the asset). |
 | **`tools/verify-demo-profiles.sh`** | Validates JSON, Git tag pins, and **no `file:`** for `com.bidscube.*` in every profile manifest. |
 | **`Assets/Editor/BidscubePublisherDemoDefines.cs`** | Reads `Packages/manifest.json` and sets **`BIDSCUBE_HAS_APPLOVIN`** / **`BIDSCUBE_HAS_LEVELPLAY`** scripting define symbols so optional mediation code **does not compile** when those packages are absent. |
 | **`SdkLaunchHub`** (partials) | Builds the runtime launcher UI: **Direct SDK** always; **AppLovin** and **LevelPlay** panels only when the corresponding define exists. |
@@ -42,8 +42,8 @@ If Android resolution fails, fix or upgrade the **package** or document the offi
 
 | File | Contents |
 | --- | --- |
-| `Packages/manifest.direct.json` | `com.bidscube.sdk` **v1.2.7** only (+ core Unity modules). |
-| `Packages/manifest.applovin.json` | Direct SDK + **`com.bidscube.applovin.max` v1.0.17** + **`com.applovin.mediation.ads`** + EDM. |
+| `Packages/manifest.direct.json` | `com.bidscube.sdk` **v1.2.8** only (+ core Unity modules). |
+| `Packages/manifest.applovin.json` | Direct SDK + **`com.bidscube.applovin.max` v1.0.19** + **`com.applovin.mediation.ads`** + EDM. |
 | `Packages/manifest.levelplay.json` | Direct SDK + **`com.bidscube.levelplay` v1.0.4** + **`com.unity.services.levelplay` 9.4.1** + EDM. |
 | `Packages/manifest.json` | **Default clone state = AppLovin profile** (copy of `manifest.applovin.json`). |
 
@@ -92,8 +92,8 @@ Log prefix: **`[LevelPlay SDK]`**.
 1. Select **Android** in **Build Settings**.
 2. For **applovin** / **levelplay** profiles: **Assets → External Dependency Manager → Android Resolver** (or **Force Resolve**).
 3. Build **APK/AAB** locally; outputs stay **untracked** (see `.gitignore`).
-4. **Bidscube core on Android:** `Assets/Plugins/Android/mainTemplate.gradle` uses **`implementation 'com.bidscube:bidscube-sdk:1.2.3@aar'`** (aligned with `com.bidscube.applovin.max` `AdapterPackageInfo`) so Gradle resolves when the adapter **Gradle postprocessor** does not run (e.g. Editor scripts in PackageCache without `.meta`). **Player Settings** enables **Custom Main Gradle Template** so this template is used.
-5. **Duplicate `com.bidscube.sdk` in Dex** can happen if both this line and the adapter’s `// __BIDSCUBE_ANDROID_MANAGED_START__` block pull the core; remove the duplicate path in the exported Gradle or fix upstream package metas so one pipeline owns core resolution.
+4. **Bidscube core on Android:** the adapter **`BidscubeAndroidGradlePostprocessor`** injects the managed Gradle block into the exported **`unityLibrary/build.gradle`**. **`Assets/Plugins/Android/mainTemplate.gradle`** in this demo only lists **MAX** / WebView AARs — do not duplicate a second `implementation` for the Bidscube core. **LiteNoVideo** builds: after export, **`launcher/build.gradle`** should **not** contain `coreLibraryDesugaringEnabled` / `desugar_jdk_libs` **if** the postprocessor stripped them (verify with the grep commands in **`ANDROID_BUILD.md`**). This template still declares desugaring for **unityLibrary**; stripping targets the **generated** launcher/unityLibrary outputs on export.
+5. **Duplicate `com.bidscube.sdk` in Dex** can happen if both a manual line and the adapter’s `// __BIDSCUBE_ANDROID_MANAGED_START__` block pull the core; remove the duplicate path in the exported Gradle or fix upstream package metas so one pipeline owns core resolution.
 
 ---
 

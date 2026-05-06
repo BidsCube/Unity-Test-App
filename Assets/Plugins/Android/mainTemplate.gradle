@@ -5,8 +5,8 @@ apply from: '../shared/common.gradle'
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    // Bidscube native core: injected by BidscubeAndroidGradlePostprocessor (LiteNoVideo → files('libs/bidscube-sdk-lite-…');
-    // FullWithVideo → files('libs/bidscube-sdk-…') or Maven). Do not add com.bidscube:bidscube-sdk here — it is not on Maven Central.
+    // Bidscube native core: injected by BidscubeAndroidGradlePostprocessor (LiteNoVideo → files('libs/bidscube-sdk-lite-no-video-…');
+    // FullWithVideo → files('libs/bidscube-sdk-full-video-…') or Maven sdk-full-video). Do not add duplicate com.bidscube core lines here.
     implementation(name: 'WebViewPlugin', ext:'aar')
     implementation(name: 'applovin-bidscube-max-adapter-1.0.4', ext:'aar')
     /* AppLovin MAX Unity JNI bridge — copied into unityLibrary/libs but must be declared (fileTree excludes *.aar). */

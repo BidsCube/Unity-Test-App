@@ -8,9 +8,9 @@ Use this before tagging or announcing a new **publisher demo** revision.
 - [ ] No `*_BurstDebugInformation_DoNotShip/` tracked
 - [ ] No generated `*.csproj` / `*.sln` tracked
 - [ ] `Packages/packages-lock.json` is **not** tracked (unless intentionally frozen and documented)
-- [ ] `manifest.applovin.json` pins **`com.bidscube.applovin.max`** and **`com.bidscube.sdk`** from **GitHub** (`AppLovin-SDK-for-BidsCube-Unity.git#v1.0.17`, `bidscube-sdk-unity.git#v1.2.7`) — без локальних `file:`
-- [ ] `manifest.levelplay.json` pins **`com.bidscube.levelplay`** і **`com.bidscube.sdk`** з **GitHub** (`LevelPlay-SDK-for-BidsCube-Unity.git#v1.0.4`, `bidscube-sdk-unity.git#v1.2.7`) — без локальних `file:`
-- [ ] `manifest.direct.json` pins **`com.bidscube.sdk`** з **GitHub** (`bidscube-sdk-unity.git#v1.2.7`) — без локальних `file:`
+- [ ] `manifest.applovin.json` pins **`com.bidscube.applovin.max`** and **`com.bidscube.sdk`** from **GitHub** (`AppLovin-SDK-for-BidsCube-Unity.git#v1.0.19`, `bidscube-sdk-unity.git#v1.2.8`) — без локальних `file:`
+- [ ] `manifest.levelplay.json` pins **`com.bidscube.levelplay`** і **`com.bidscube.sdk`** з **GitHub** (`LevelPlay-SDK-for-BidsCube-Unity.git#v1.0.4`, `bidscube-sdk-unity.git#v1.2.8`) — без локальних `file:`
+- [ ] `manifest.direct.json` pins **`com.bidscube.sdk`** з **GitHub** (`bidscube-sdk-unity.git#v1.2.8`) — без локальних `file:`
 - [ ] Default `Packages/manifest.json` is **AppLovin** demo (or README documents any intentional change)
 - [ ] `tools/use-demo-profile.sh` runs for `direct`, `applovin`, `levelplay`
 - [ ] `bash tools/verify-publisher-demo-ready.sh` passes in CI

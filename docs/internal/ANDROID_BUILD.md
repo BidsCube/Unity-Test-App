@@ -2,7 +2,9 @@
 
 ## Test app defaults (this repo)
 
-- **`Assets/Settings/BidscubeAndroidExportSettings.asset`** — **LiteNoVideo**, **`enableDesugaring` enabled** (default). The bundled **`bidscube-sdk-lite-*.aar`** declares in AAR metadata that **`:launcher` must use core library desugaring** — turning it off causes **`:launcher:checkReleaseAarMetadata`** to fail. Only disable desugaring if you use a core artifact that does not require it.
+- **`Assets/BidscubeAndroidExportSettings.asset`** — default committed state is **LiteNoVideo** (`featureSet: 0`) for the AppLovin demo checkout. Use **`./tools/use-demo-profile.sh applovin-lite`** / **`applovin-video`** (or **`levelplay-*`**) to flip **`featureSet`** without hand-editing YAML.
+- **LiteNoVideo + `sdk-lite-no-video`:** the adapter Gradle postprocessor **strips** `coreLibraryDesugaring` / `coreLibraryDesugaringEnabled` from the **generated** **launcher** and **unityLibrary** `build.gradle` after export so the lite artifact should not force desugaring.
+- **FullWithVideo:** postprocessor **ensures** `coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'` and `coreLibraryDesugaringEnabled true` in **launcher** when missing.
 - **Verbose logging:** `PublisherDemoVerboseBootstrap` enables full stack traces for all Unity log types; `TestIntegration` keeps **EnableLogging** + **EnableDebugMode**; MAX **SetVerboseLogging(true)** always in the launcher and `AppLovinDemoController`. Filter logcat, for example: `adb logcat | grep -iE 'BidsCube Demo|Direct SDK|AppLovin SDK|BidscubeSDK|Bidscube AppLovin|MaxSdk|Unity'`.
 
 ## 1. Select profile
@@ -10,13 +12,28 @@
 For AppLovin:
 
 ```bash
+./tools/use-demo-profile.sh applovin-lite
+# or legacy alias:
 ./tools/use-demo-profile.sh applovin
+```
+
+For **AppLovin** with **FullWithVideo**:
+
+```bash
+./tools/use-demo-profile.sh applovin-video
 ```
 
 For LevelPlay:
 
 ```bash
-./tools/use-demo-profile.sh levelplay
+./tools/use-demo-profile.sh levelplay-lite
+# or: ./tools/use-demo-profile.sh levelplay
+```
+
+For **LevelPlay** + **FullWithVideo**:
+
+```bash
+./tools/use-demo-profile.sh levelplay-video
 ```
 
 For Direct SDK only:
@@ -102,31 +119,26 @@ Use:
 
 Then open Unity.
 
-**Important:** BidsCube AppLovin adapter **v1.0.17** supports two Android modes:
+**Important:** BidsCube AppLovin adapter **v1.0.19** supports two Android modes:
+
+- **LiteNoVideo** (default for this demo’s committed **`BidscubeAndroidExportSettings.asset`**)
+  - **`bidscube-sdk-lite-no-video`** — no Media3 / IMA  
+  - post-export **launcher** should **not** contain desugaring lines (verify below)  
 
 - **FullWithVideo**
-  - default  
-  - uses full video dependency graph  
-  - Media3 / IMA required  
+  - **`bidscube-sdk-full-video`** + Media3 / IMA  
+  - **launcher** should contain **`coreLibraryDesugaringEnabled true`** and **`desugar_jdk_libs:2.0.4`**  
 
-- **LiteNoVideo**
-  - no video player  
-  - no Media3 / IMA  
-  - easier build mode for banner/native-only demo  
+If Android build fails with missing **`com.bidscube:sdk-full-video`** or **Media3 / IMA** errors, confirm you are on **FullWithVideo** and have the full AAR or Maven repo. For banner/native-only smoke tests, use **`applovin-lite`**.
 
-If Android build fails with:
+### Verify exported Gradle (after Unity Android export)
 
-```text
-Could not find com.bidscube:bidscube-sdk:1.2.3
+```bash
+grep -R "coreLibraryDesugaringEnabled" exported-android-project/launcher/build.gradle || true
+grep -R "desugar_jdk_libs" exported-android-project/launcher/build.gradle || true
 ```
 
-or **Media3 / IMA** dependency errors, try:
-
-**Tools → Bidscube SDK → Android Build Features → LiteNoVideo**
-
-Then rebuild.
-
-If **LiteNoVideo** builds but **FullWithVideo** does not, the issue is **not** Unity-Test-App. It means the full video dependency path in the **AppLovin adapter package** must be fixed or the required Maven dependency must be published/available.
+For **LiteNoVideo**, these grep commands should print **nothing**. For **FullWithVideo**, both should be present.
 
 ---
 

@@ -1,6 +1,6 @@
 # BidsCube Unity Publisher Demo — integration guide
 
-Audience: **publishers and integration partners** wiring BidsCube with **Direct SDK**, **AppLovin MAX**, or **Unity LevelPlay**. For the shortest **AppLovin MAX** path, start with the root **[README.md](README.md)**.
+Audience: **publishers and integration partners** wiring BidsCube with **Direct SDK**, **AppLovin MAX**, or **Unity LevelPlay**. For the shortest **AppLovin MAX** path, start with the root **[README.md](README.md)**. **UPM / `manifest.json` examples:** **[docs/PACKAGE_SETUP.md](docs/PACKAGE_SETUP.md)**.
 
 ---
 
@@ -9,8 +9,12 @@ Audience: **publishers and integration partners** wiring BidsCube with **Direct 
 | Your goal | Profile | Command |
 | --- | --- | --- |
 | BidsCube API only (banner / video / native) | `direct` | `./tools/use-demo-profile.sh direct` |
-| MAX mediation + BidsCube adapter | `applovin` | `./tools/use-demo-profile.sh applovin` |
-| Unity LevelPlay + BidsCube adapter | `levelplay` | `./tools/use-demo-profile.sh levelplay` |
+| MAX + BidsCube, **LiteNoVideo** (no video stack / no desugaring in launcher) | `applovin-lite` | `./tools/use-demo-profile.sh applovin-lite` |
+| MAX + BidsCube, **FullWithVideo** | `applovin-video` | `./tools/use-demo-profile.sh applovin-video` |
+| MAX mediation + BidsCube adapter (alias of **applovin-lite**) | `applovin` | `./tools/use-demo-profile.sh applovin` |
+| LevelPlay + BidsCube, **LiteNoVideo** | `levelplay-lite` | `./tools/use-demo-profile.sh levelplay-lite` |
+| LevelPlay + BidsCube, **FullWithVideo** | `levelplay-video` | `./tools/use-demo-profile.sh levelplay-video` |
+| Unity LevelPlay + BidsCube adapter (alias of **levelplay-lite**) | `levelplay` | `./tools/use-demo-profile.sh levelplay` |
 
 Run the script **before** opening Unity, then open the folder and wait for **Package Manager** to finish resolving.
 

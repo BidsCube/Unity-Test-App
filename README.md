@@ -1,5 +1,7 @@
 # BidsCube Unity Test App — Publisher Demo
 
+**Як підключити пакети (UPM, Git):** [docs/PACKAGE_SETUP.md](docs/PACKAGE_SETUP.md) — **`com.bidscube.*`** лише з [bidscube-sdk-unity](https://github.com/BidsCube/bidscube-sdk-unity) та [AppLovin-SDK-for-BidsCube-Unity](https://github.com/BidsCube/AppLovin-SDK-for-BidsCube-Unity) (див. гайд).
+
 This project is a minimal Unity demo for testing BidsCube SDK integration with **Direct SDK**, **AppLovin MAX**, and **Unity LevelPlay**. Pick one path at a time using the profile scripts under `tools/`.
 
 ## AppLovin MAX quick start
@@ -19,7 +21,7 @@ This project is a minimal Unity demo for testing BidsCube SDK integration with *
 8. Enter your **AppLovin MAX SDK Key** and **Ad Unit IDs** (or use the JSON / on-screen flow described in **[PUBLISHER_GUIDE.md](PUBLISHER_GUIDE.md)**).
 9. **File → Build Settings → Android**, then build and run an **APK** on a device or emulator.
 
-The Android project is already configured with core library desugaring because the BidsCube Android lite AAR requires it through AAR metadata.
+The default **AppLovin** checkout uses **LiteNoVideo** (`Assets/BidscubeAndroidExportSettings.asset`). Use **`./tools/use-demo-profile.sh applovin-video`** for **FullWithVideo** (video stack + launcher desugaring). See **[docs/internal/ANDROID_BUILD.md](docs/internal/ANDROID_BUILD.md)** for post-export Gradle grep checks.
 
 For build troubleshooting, see **[docs/internal/ANDROID_BUILD.md](docs/internal/ANDROID_BUILD.md)**.
 
@@ -27,7 +29,8 @@ For build troubleshooting, see **[docs/internal/ANDROID_BUILD.md](docs/internal/
 
 ## More help
 
+- **[docs/PACKAGE_SETUP.md](docs/PACKAGE_SETUP.md)** — приклади `manifest.json`, профілі `use-demo-profile.sh`, Git URL.
 - **[PUBLISHER_GUIDE.md](PUBLISHER_GUIDE.md)** — Direct SDK, AppLovin MAX, and LevelPlay demos; where to enter keys and ad units; logs; Android build overview.
-- **Other profiles:** `./tools/use-demo-profile.sh direct` or `./tools/use-demo-profile.sh levelplay` (run before opening Unity when switching).
+- **Other profiles:** `./tools/use-demo-profile.sh direct`, **`applovin-lite`**, **`applovin-video`**, **`levelplay-lite`**, **`levelplay-video`** (or legacy **`applovin`** / **`levelplay`** aliases — run before opening Unity when switching).
 
 Maintainer / architecture notes: **[docs/internal/DOCUMENTATION.md](docs/internal/DOCUMENTATION.md)**.

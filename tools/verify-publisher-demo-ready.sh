@@ -32,17 +32,17 @@ if git ls-files -- 'Packages/packages-lock.json' | grep -q .; then
 fi
 
 # --- manifest pins: all BidsCube UPM entries = GitHub tags (no file: local paths) ---
-grep -q 'bidscube-sdk-unity\.git#v1\.2\.7' Packages/manifest.direct.json \
-  || die "manifest.direct.json: com.bidscube.sdk must use GitHub#v1.2.7 (no file:)"
-grep -q 'AppLovin-SDK-for-BidsCube-Unity.git#v1.0.17' Packages/manifest.applovin.json \
-  || die "manifest.applovin: com.bidscube.applovin.max must use GitHub#v1.0.17 (no file:)"
-grep -q 'bidscube-sdk-unity.git#v1.2.7' Packages/manifest.applovin.json \
-  || die "manifest.applovin: com.bidscube.sdk must use GitHub#v1.2.7 (no file:)"
-grep -q 'AppLovin-SDK-for-BidsCube-Unity.git#v1.0.17' Packages/manifest.json \
-  || die "manifest.json: com.bidscube.applovin.max must use GitHub#v1.0.17 (default AppLovin demo)"
-grep -q 'bidscube-sdk-unity.git#v1.2.7' Packages/manifest.json \
-  || die "manifest.json: com.bidscube.sdk must use GitHub#v1.2.7 (default AppLovin demo)"
-grep -q 'LevelPlay-SDK-for-BidsCube-Unity.git#v1.0.4' Packages/manifest.levelplay.json \
+grep -q 'bidscube-sdk-unity\.git#v1\.2\.8' Packages/manifest.direct.json \
+  || die "manifest.direct.json: com.bidscube.sdk must use GitHub#v1.2.8 (no file:)"
+grep -q 'AppLovin-SDK-for-BidsCube-Unity\.git#v1\.0\.19' Packages/manifest.applovin.json \
+  || die "manifest.applovin: com.bidscube.applovin.max must use GitHub#v1.0.19 (no file:)"
+grep -q 'bidscube-sdk-unity\.git#v1\.2\.8' Packages/manifest.applovin.json \
+  || die "manifest.applovin: com.bidscube.sdk must use GitHub#v1.2.8 (no file:)"
+grep -q 'AppLovin-SDK-for-BidsCube-Unity\.git#v1\.0\.19' Packages/manifest.json \
+  || die "manifest.json: com.bidscube.applovin.max must use GitHub#v1.0.19 (default AppLovin demo)"
+grep -q 'bidscube-sdk-unity\.git#v1\.2\.8' Packages/manifest.json \
+  || die "manifest.json: com.bidscube.sdk must use GitHub#v1.2.8 (default AppLovin demo)"
+grep -q 'LevelPlay-SDK-for-BidsCube-Unity\.git#v1\.0\.4' Packages/manifest.levelplay.json \
   || die "manifest.levelplay missing adapter#v1.0.4"
 grep -q 'com.unity.services.levelplay' Packages/manifest.levelplay.json \
   || die "manifest.levelplay missing com.unity.services.levelplay"
@@ -58,6 +58,8 @@ grep -q '9.4.1' Packages/manifest.levelplay.json \
 [[ -x tools/collect-android-build-diagnostics.sh ]] || die "tools/collect-android-build-diagnostics.sh must be executable (chmod +x)"
 [[ -x tools/reset-android-build-state.sh ]] || die "tools/reset-android-build-state.sh must be executable (chmod +x)"
 grep -q 'docs/internal/ANDROID_BUILD.md' README.md || die "README should link docs/internal/ANDROID_BUILD.md (Android troubleshooting)"
+[[ -f tools/templates/BidscubeAndroidExportSettings.Lite.asset ]] || die "Missing tools/templates/BidscubeAndroidExportSettings.Lite.asset"
+[[ -f Assets/BidscubeAndroidExportSettings.asset ]] || die "Missing Assets/BidscubeAndroidExportSettings.asset (default LiteNoVideo for AppLovin demo)"
 
 # --- no tracked BidsCube / SDK binaries under demo Android plugins (Gradle templates OK) ---
 while IFS= read -r f; do
