@@ -1,8 +1,14 @@
 # BidsCube Unity Test App — Publisher Demo
 
-**Локальні UPM-пакети (монорепо):** [docs/PACKAGE_SETUP.md](docs/PACKAGE_SETUP.md) — **`com.bidscube.*`** через **`file:../../…`** (база шляху — папка **`Packages/`** у Unity): `../../bidscube-sdk-unity`, `../../AppLovin-SDK-Unity`, `../../LevelPlay-SDK-for-BidsCube-Unity` поруч із каталогом проєкту. Офіційні репозиторії на GitHub — для релізів і зовнішніх інтеграторів.
+**UPM (релізні теги):** у профільних **`Packages/manifest*.json`** пакети **`com.bidscube.*`** підключені з **GitHub** за тегами **v1.2.9** (core), **v1.0.20** (AppLovin MAX), **v1.0.5** (LevelPlay). Для локальної розробки в монорепо можна замінити рядки на **`file:../../…`** — див. [docs/PACKAGE_SETUP.md](docs/PACKAGE_SETUP.md).
 
-**Очікувані версії в `package.json` локальних пакетів:** `com.bidscube.sdk` **v1.2.8**, `com.bidscube.applovin.max` **v1.0.19** (split Android AARs `bidscube-sdk-lite-no-video-1.2.4.aar` / `bidscube-sdk-full-video-1.2.4.aar` in the adapter package).
+- **`com.bidscube.sdk`** → `https://github.com/BidsCube/bidscube-sdk-unity.git#v1.2.9`
+- **`com.bidscube.applovin.max`** → `https://github.com/BidsCube/AppLovin-SDK-for-BidsCube-Unity.git#v1.0.20`
+- **`com.bidscube.levelplay`** (профіль LevelPlay) → `https://github.com/BidsCube/LevelPlay-SDK-for-BidsCube-Unity.git#v1.0.5`
+
+**EDM:** `https://github.com/googlesamples/unity-jar-resolver.git?path=/upm#v1.2.182` у профілях з AppLovin / LevelPlay.
+
+**Очікувані версії пакетів (UPM):** core SDK **v1.2.9**, AppLovin adapter **v1.0.20**, LevelPlay adapter **v1.0.5** (split Android AARs `bidscube-sdk-lite-no-video-1.2.4.aar` / `bidscube-sdk-full-video-1.2.4.aar` у пакетах адаптерів).
 
 This project is a minimal Unity demo for testing BidsCube SDK integration with **Direct SDK**, **AppLovin MAX**, and **Unity LevelPlay**. Pick one path at a time using the profile scripts under `tools/`.
 
@@ -16,7 +22,7 @@ This project is a minimal Unity demo for testing BidsCube SDK integration with *
 ```
 
 3. Open the project in **Unity**.
-4. Wait until **Unity Package Manager** finishes resolving packages.
+4. Wait until **Unity Package Manager** finishes resolving packages (BidsCube з **Git** + EDM / registry).
 5. Run **Assets → External Dependency Manager → Android Resolver → Force Resolve**.
 6. Open **`Assets/Sample scene.unity`**.
 7. In the demo UI, open **AppLovin MAX**.
@@ -33,7 +39,7 @@ For build troubleshooting, see **[docs/internal/ANDROID_BUILD.md](docs/internal/
 
 ## More help
 
-- **[docs/PACKAGE_SETUP.md](docs/PACKAGE_SETUP.md)** — `manifest.json`, профілі `use-demo-profile.sh`, локальні `file:` та (за потреби) Git URL.
+- **[docs/PACKAGE_SETUP.md](docs/PACKAGE_SETUP.md)** — `manifest.json`, профілі `use-demo-profile.sh`, Git vs **`file:`** для BidsCube.
 - **[PUBLISHER_GUIDE.md](PUBLISHER_GUIDE.md)** — Direct SDK, AppLovin MAX, and LevelPlay demos; where to enter keys and ad units; logs; Android build overview.
 - **Other profiles:** `./tools/use-demo-profile.sh direct`, **`applovin-lite`**, **`applovin-video`**, **`levelplay-lite`**, **`levelplay-video`** (or legacy **`applovin`** / **`levelplay`** aliases — run before opening Unity when switching).
 

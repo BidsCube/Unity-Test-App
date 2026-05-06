@@ -17,78 +17,110 @@ for file in "${MANIFESTS[@]}"; do
   python3 -m json.tool "$file" > /dev/null
 done
 
-# --- com.bidscube.* : local file: packages (siblings of this Unity project folder) ---
+# --- com.bidscube.* : local monorepo (file:) and/or GitHub tags ---
 python3 << 'PY'
 import json
 import glob
 import os
 
 ROOT = os.path.realpath(os.getcwd())
-PARENT = os.path.realpath(os.path.join(ROOT, ".."))
+PARENT = os.path.dirname(ROOT)
 
-# Exact pins: project root is …/bidscube-testapp-unity-master; packages live in …/bidscube-sdk-unity etc.
-EXPECTED = {
-    "com.bidscube.sdk": "file:../../bidscube-sdk-unity",
-    "com.bidscube.applovin.max": "file:../../AppLovin-SDK-Unity",
-    "com.bidscube.levelplay": "file:../../LevelPlay-SDK-for-BidsCube-Unity",
-}
+SDK_GIT = "https://github.com/BidsCube/bidscube-sdk-unity.git#v1.2.9"
+SDK_FILE = "file:../../bidscube-sdk-unity"
 
-for path in sorted(glob.glob("Packages/manifest*.json")):
-    with open(path, encoding="utf-8") as f:
-        raw = f.read()
-    if "LevelPlay-SDK-for-BidsCube-Unity.git#v1.0.4" in raw:
+MAX_GIT = "https://github.com/BidsCube/AppLovin-SDK-for-BidsCube-Unity.git#v1.0.20"
+MAX_FILE = "file:../../AppLovin-SDK-Unity"
+
+LP_GIT = "https://github.com/BidsCube/LevelPlay-SDK-for-BidsCube-Unity.git#v1.0.5"
+LP_FILE = "file:../../LevelPlay-SDK-for-BidsCube-Unity"
+
+EDM_SPEC = "https://github.com/googlesamples/unity-jar-resolver.git?path=/upm#v1.2.182"
+
+
+def validate_local_folder(folder_segment: str, expected_package: str):
+    """folder_segment: e.g. 'bidscube-sdk-unity' — resolved from Packages/../../"""
+    abs_pkg = os.path.realpath(os.path.join(ROOT, "Packages", "..", "..", folder_segment))
+    if os.path.dirname(abs_pkg) != PARENT:
         raise SystemExit(
-            f"{path}: do not pin com.bidscube.levelplay to non-existent Git tag v1.0.4; use file:../../… or an existing tag"
+            f"file: path for {expected_package} must resolve to a direct sibling of the Unity project folder, got {abs_pkg}"
         )
+    pj = os.path.join(abs_pkg, "package.json")
+    if not os.path.isfile(pj):
+        raise SystemExit(f"Local package missing package.json at {pj}")
+    with open(pj, encoding="utf-8") as jf:
+        meta = json.load(jf)
+    if meta.get("name") != expected_package:
+        raise SystemExit(f"{pj}: expected package name {expected_package!r}, got {meta.get('name')!r}")
+
 
 for path in sorted(glob.glob("Packages/manifest*.json")):
     with open(path, encoding="utf-8") as f:
         data = json.load(f)
     deps = data.get("dependencies") or {}
+
+    sdk = deps.get("com.bidscube.sdk")
+    if sdk not in (SDK_GIT, SDK_FILE):
+        raise SystemExit(f"{path}: com.bidscube.sdk must be {SDK_GIT!r} or {SDK_FILE!r}, got {sdk!r}")
+    if sdk == SDK_FILE:
+        validate_local_folder("bidscube-sdk-unity", "com.bidscube.sdk")
+
+    max_dep = deps.get("com.bidscube.applovin.max")
+    if max_dep is not None:
+        if max_dep not in (MAX_GIT, MAX_FILE):
+            raise SystemExit(f"{path}: com.bidscube.applovin.max must be Git pin or {MAX_FILE!r}, got {max_dep!r}")
+        if max_dep == MAX_FILE:
+            validate_local_folder("AppLovin-SDK-Unity", "com.bidscube.applovin.max")
+
+    lp_dep = deps.get("com.bidscube.levelplay")
+    if lp_dep is not None:
+        if lp_dep not in (LP_GIT, LP_FILE):
+            raise SystemExit(f"{path}: com.bidscube.levelplay must be Git pin or {LP_FILE!r}, got {lp_dep!r}")
+        if lp_dep == LP_FILE:
+            validate_local_folder("LevelPlay-SDK-for-BidsCube-Unity", "com.bidscube.levelplay")
+
     for name, spec in deps.items():
         if not name.startswith("com.bidscube."):
             continue
-        if not isinstance(spec, str):
-            raise SystemExit(f"{path}: {name} value must be a string, got {type(spec)}")
-        exp = EXPECTED.get(name)
-        if exp is None:
-            raise SystemExit(f"{path}: unexpected BidsCube dependency {name!r}")
-        if spec != exp:
-            raise SystemExit(f"{path}: {name} must be {exp!r}, got {spec!r}")
-        rel = spec[5:].strip()
-        abs_pkg = os.path.realpath(os.path.join(ROOT, "Packages", rel))
-        if os.path.dirname(abs_pkg) != PARENT:
-            raise SystemExit(
-                f"{path}: {name} must resolve to a direct sibling of the Unity project folder, got {abs_pkg}"
-            )
-        pj = os.path.join(abs_pkg, "package.json")
-        if not os.path.isfile(pj):
-            raise SystemExit(f"{path}: {name} missing package.json at {pj}")
-        with open(pj, encoding="utf-8") as jf:
-            meta = json.load(jf)
-        if meta.get("name") != name:
-            raise SystemExit(f"{pj}: expected package name {name!r}, got {meta.get('name')!r}")
+        if name in ("com.bidscube.sdk", "com.bidscube.applovin.max", "com.bidscube.levelplay"):
+            continue
+        raise SystemExit(f"{path}: unexpected BidsCube dependency {name!r}")
+
+# EDM where present (all profiles except direct)
+for path in sorted(glob.glob("Packages/manifest*.json")):
+    if path.endswith("manifest.direct.json"):
+        continue
+    with open(path, encoding="utf-8") as f:
+        data = json.load(f)
+    deps = data.get("dependencies") or {}
+    ed = deps.get("com.google.external-dependency-manager")
+    if ed != EDM_SPEC:
+        raise SystemExit(f"{path}: com.google.external-dependency-manager must be {EDM_SPEC!r}, got {ed!r}")
 PY
 
 # --- applovin profile ---
-grep -q "file:../../bidscube-sdk-unity" Packages/manifest.applovin.json
-grep -q "file:../../AppLovin-SDK-Unity" Packages/manifest.applovin.json
+grep -qE 'file:../../bidscube-sdk-unity|bidscube-sdk-unity\.git#v1\.2\.9' Packages/manifest.applovin.json
+grep -qE 'file:../../AppLovin-SDK-Unity|AppLovin-SDK-for-BidsCube-Unity\.git#v1\.0\.20' Packages/manifest.applovin.json
 grep -q "com.applovin.mediation.ads" Packages/manifest.applovin.json
 grep -q "https://unity.packages.applovin.com/" Packages/manifest.applovin.json
 
 # --- levelplay profile pins ---
-grep -q "file:../../bidscube-sdk-unity" Packages/manifest.levelplay.json
-grep -q "file:../../LevelPlay-SDK-for-BidsCube-Unity" Packages/manifest.levelplay.json
+grep -qE 'file:../../bidscube-sdk-unity|bidscube-sdk-unity\.git#v1\.2\.9' Packages/manifest.levelplay.json
+grep -qE 'file:../../LevelPlay-SDK-for-BidsCube-Unity|LevelPlay-SDK-for-BidsCube-Unity\.git#v1\.0\.5' Packages/manifest.levelplay.json
 grep -q "com.unity.services.levelplay" Packages/manifest.levelplay.json
 grep -q "com.applovin.mediation.ads" Packages/manifest.levelplay.json
 grep -q "https://unity.packages.applovin.com/" Packages/manifest.levelplay.json
 
 # --- default manifest (AppLovin demo) ---
-grep -q "file:../../bidscube-sdk-unity" Packages/manifest.json
-grep -q "file:../../AppLovin-SDK-Unity" Packages/manifest.json
+grep -qE 'file:../../bidscube-sdk-unity|bidscube-sdk-unity\.git#v1\.2\.9' Packages/manifest.json
+grep -qE 'file:../../AppLovin-SDK-Unity|AppLovin-SDK-for-BidsCube-Unity\.git#v1\.0\.20' Packages/manifest.json
 
 # --- direct profile ---
-grep -q "file:../../bidscube-sdk-unity" Packages/manifest.direct.json
+grep -qE 'file:../../bidscube-sdk-unity|bidscube-sdk-unity\.git#v1\.2\.9' Packages/manifest.direct.json
+if grep -q "com.google.external-dependency-manager" Packages/manifest.direct.json; then
+  echo "FAIL: direct profile must not list EDM"
+  exit 1
+fi
 
 # --- profile script supports lite / video aliases ---
 for token in applovin-lite applovin-video levelplay-lite levelplay-video; do

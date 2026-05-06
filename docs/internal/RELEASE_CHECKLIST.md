@@ -8,8 +8,8 @@ Use this before tagging or announcing a new **publisher demo** revision.
 - [ ] No `*_BurstDebugInformation_DoNotShip/` tracked
 - [ ] No generated `*.csproj` / `*.sln` tracked
 - [ ] `Packages/packages-lock.json` is **not** tracked (unless intentionally frozen and documented)
-- [ ] Усі профільні маніфести підключають **`com.bidscube.*`** як **`file:../../…`** (шлях від **`Packages/`**; див. `tools/verify-demo-profiles.sh`): `../../bidscube-sdk-unity`, `../../AppLovin-SDK-Unity`, `../../LevelPlay-SDK-for-BidsCube-Unity`
-- [ ] Версії в **`package.json`** сусідніх пакетів узгоджені з оголошеним релізом (наприклад core **1.2.8**, AppLovin adapter **1.0.19**)
+- [ ] **`com.bidscube.*`** у профільних маніфестах — **Git-теги** (за замовчуванням) **або** **`file:../../…`**: core **v1.2.9**, AppLovin **v1.0.20**, LevelPlay **v1.0.5**
+- [ ] Версії / шляхи в **`manifest*.json`** узгоджені з релізом (core **1.2.9**, AppLovin **1.0.20**, LevelPlay **1.0.5** або актуальний тег)
 - [ ] Default `Packages/manifest.json` is **AppLovin** demo (or README documents any intentional change)
 - [ ] `tools/use-demo-profile.sh` runs for `direct`, `applovin`, `levelplay`
 - [ ] `bash tools/verify-publisher-demo-ready.sh` passes in CI

@@ -3,7 +3,7 @@
 ## Test app defaults (this repo)
 
 - **Committed Gradle templates** (`Assets/Plugins/Android/mainTemplate.gradle`, `launcherTemplate.gradle`) do **not** hard-code `coreLibraryDesugaring` / `coreLibraryDesugaringEnabled` — Lite / No Video stays desugar-free at the project level; **FullWithVideo** relies on the postprocessor to inject desugaring into the **exported** launcher when needed.
-- **`Assets/BidscubeAndroidExportSettings.asset`** — default committed state is **LiteNoVideo** (`featureSet: 0`) for the AppLovin demo checkout. Use **`./tools/use-demo-profile.sh applovin-lite`** / **`applovin-video`** (or **`levelplay-*`**) to flip **`featureSet`** without hand-editing YAML.
+- **`Assets/BidscubeAndroidExportSettings.asset`** — default committed state is **LiteNoVideo** (`featureSet: 0`, `enableDesugaring: 0`) for the AppLovin demo checkout. **`./tools/use-demo-profile.sh *-video`** copies **FullWithVideo** (`featureSet: 1`, `enableDesugaring: 1`) from **`tools/templates/`** so the adapter postprocessor injects desugaring only for that export mode.
 - **LiteNoVideo + `sdk-lite-no-video`:** the adapter Gradle postprocessor **strips** `coreLibraryDesugaring` / `coreLibraryDesugaringEnabled` from the **generated** **launcher** and **unityLibrary** `build.gradle` after export so the lite artifact should not force desugaring.
 - **FullWithVideo:** postprocessor **ensures** `coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'` and `coreLibraryDesugaringEnabled true` in **launcher** when missing.
 - **Verbose logging:** `PublisherDemoVerboseBootstrap` enables full stack traces for all Unity log types; `TestIntegration` keeps **EnableLogging** + **EnableDebugMode**; MAX **SetVerboseLogging(true)** always in the launcher and `AppLovinDemoController`. Filter logcat, for example: `adb logcat | grep -iE 'BidsCube Demo|Direct SDK|AppLovin SDK|BidscubeSDK|Bidscube AppLovin|MaxSdk|Unity'`.
@@ -120,7 +120,7 @@ Use:
 
 Then open Unity.
 
-**Important:** BidsCube AppLovin adapter **v1.0.19** supports two Android modes:
+**Important:** BidsCube AppLovin adapter **v1.0.20** supports two Android modes:
 
 - **LiteNoVideo** (default for this demo’s committed **`BidscubeAndroidExportSettings.asset`**)
   - **`bidscube-sdk-lite-no-video`** — no Media3 / IMA  

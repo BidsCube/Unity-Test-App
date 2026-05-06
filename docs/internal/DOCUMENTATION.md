@@ -12,7 +12,7 @@ Publisher-facing quick starts live in the root **[README.md](../README.md)**, **
 | --- | --- |
 | **`Packages/manifest.*.json`** | Declares which SDKs are installed for a given profile (`direct`, `applovin`, `applovin-lite`, `applovin-video`, `levelplay`, `levelplay-lite`, `levelplay-video`). |
 | **`tools/use-demo-profile.sh`** / **`use-demo-profile.ps1`** | Copies one profile manifest to `Packages/manifest.json`, deletes `packages-lock.json`, and sets **`Assets/BidscubeAndroidExportSettings.asset`** (`applovin-lite` / `levelplay-lite` → **LiteNoVideo**; `*-video` → **FullWithVideo**; `direct` removes the asset). |
-| **`tools/verify-demo-profiles.sh`** | Validates JSON, **`file:../../…`** pins for `com.bidscube.*` (UPM resolves `file:` from **`Packages/`**), `package.json` presence and package name. |
+| **`tools/verify-demo-profiles.sh`** | Validates JSON, дозволені **`file:`** або Git-піни для **`com.bidscube.*`**, EDM з **googlesamples**. |
 | **`Assets/Editor/BidscubePublisherDemoDefines.cs`** | Reads `Packages/manifest.json` and sets **`BIDSCUBE_HAS_APPLOVIN`** / **`BIDSCUBE_HAS_LEVELPLAY`** scripting define symbols so optional mediation code **does not compile** when those packages are absent. |
 | **`SdkLaunchHub`** (partials) | Builds the runtime launcher UI: **Direct SDK** always; **AppLovin** and **LevelPlay** panels only when the corresponding define exists. |
 | **`Assets/Resources/BidscubeDemoConfig.json`** | JSON placeholders for BidsCube, AppLovin, and LevelPlay IDs (no production secrets in git). |
@@ -42,9 +42,9 @@ If Android resolution fails, fix or upgrade the **package** or document the offi
 
 | File | Contents |
 | --- | --- |
-| `Packages/manifest.direct.json` | `com.bidscube.sdk` через **`file:../../bidscube-sdk-unity`** (+ core Unity modules). |
-| `Packages/manifest.applovin.json` | Direct SDK + **`com.bidscube.applovin.max`** (`file:../../AppLovin-SDK-Unity`) + **`com.applovin.mediation.ads`** + EDM. |
-| `Packages/manifest.levelplay.json` | Direct SDK + **`com.bidscube.levelplay`** (`file:../../LevelPlay-SDK-for-BidsCube-Unity`) + **`com.unity.services.levelplay` 9.4.1** + EDM. |
+| `Packages/manifest.direct.json` | `com.bidscube.sdk` з **Git `#v1.2.9`** (або **`file:../../bidscube-sdk-unity`**) + core Unity modules. |
+| `Packages/manifest.applovin.json` | SDK + **`com.bidscube.applovin.max`** **Git `#v1.0.20`** (або **`file:../../AppLovin-SDK-Unity`**) + **`com.applovin.mediation.ads`** + EDM. |
+| `Packages/manifest.levelplay.json` | SDK + **`com.bidscube.levelplay`** **Git `#v1.0.5`** (або **`file:../../LevelPlay-SDK-for-BidsCube-Unity`**) + **`com.unity.services.levelplay` 9.4.1** + EDM. |
 | `Packages/manifest.json` | **Default clone state = AppLovin profile** (copy of `manifest.applovin.json`). |
 
 Conditional compilation:

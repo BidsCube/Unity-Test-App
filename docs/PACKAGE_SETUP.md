@@ -1,32 +1,32 @@
 # Підключення пакетів BidsCube (UPM)
 
-## Монорепо (цей робочий простір)
+## За замовчуванням: Git + релізні теги
 
-У `manifest.json` шляхи **`file:`** задаються **від папки `Packages/`** (так резолвить Unity Package Manager). Сусідні репозиторії монорепо лежать на рівень вище за корінь проєкту → потрібно **`file:../../<папка>`**, а не один `../`.
+У **`Packages/manifest*.json`** **`com.bidscube.*`** закріплені на **GitHub** (теги узгоджені з **`tools/verify-demo-profiles.sh`**). EDM — з **GitHub** (jar-resolver).
 
-| Пакет | Значення в `manifest` | Каталог поруч із проєктом |
-|--------|------------------------|---------------------------|
-| **`com.bidscube.sdk`** | `file:../../bidscube-sdk-unity` | `bidscube-sdk-unity/` |
-| **`com.bidscube.applovin.max`** | `file:../../AppLovin-SDK-Unity` | `AppLovin-SDK-Unity/` |
-| **`com.bidscube.levelplay`** | `file:../../LevelPlay-SDK-for-BidsCube-Unity` | `LevelPlay-SDK-for-BidsCube-Unity/` |
-| **`com.google.external-dependency-manager`** | `file:../../unity-jar-resolver/upm` | `unity-jar-resolver/` (клон [unity-jar-resolver](https://github.com/googlesamples/unity-jar-resolver), гілка/тег **v1.2.182**; без DNS до GitHub — тільки локальна копія) |
+| Пакет | Значення в `manifest` |
+|--------|----------------------|
+| **`com.bidscube.sdk`** | `https://github.com/BidsCube/bidscube-sdk-unity.git#v1.2.9` |
+| **`com.bidscube.applovin.max`** | `https://github.com/BidsCube/AppLovin-SDK-for-BidsCube-Unity.git#v1.0.20` |
+| **`com.bidscube.levelplay`** | `https://github.com/BidsCube/LevelPlay-SDK-for-BidsCube-Unity.git#v1.0.5` |
+| **`com.google.external-dependency-manager`** | `https://github.com/googlesamples/unity-jar-resolver.git?path=/upm#v1.2.182` |
 
-Очікувана розкладка:
+### Локальна розробка (монорепо)
 
-```text
-<workspace>/
-  bidscube-testapp-unity-master/   ← Unity project (відкривати цю папку в Unity)
-  bidscube-sdk-unity/
-  AppLovin-SDK-Unity/
-  LevelPlay-SDK-for-BidsCube-Unity/
-  unity-jar-resolver/              ← EDM (upm-пакет у підпапці upm/)
+Поруч із коренем Unity-проєкту можна клонувати **`bidscube-sdk-unity/`**, **`AppLovin-SDK-Unity/`**, **`LevelPlay-SDK-for-BidsCube-Unity/`** і в маніфестах замінити Git URL на **`file:../../…`** від **`Packages/`** — тоді UPM підхопить локальні копії без очікування на теги.
+
+Перевірка з кореня проєкту:
+
+```bash
+bash tools/verify-demo-profiles.sh
+bash tools/verify-publisher-demo-ready.sh
 ```
 
-Перевірка: `bash tools/verify-demo-profiles.sh` (наявність `package.json`, ім’я пакета, шлях — прямий «сусід» каталогу проєкту). У **GitHub Actions** (`.github/workflows/publisher-demo.yml`) перед цим кроком репозиторій клонує сусідні UPM-пакети в каталог **над** `GITHUB_WORKSPACE`, щоб структура збігалася з локальним монорепо.
+У **GitHub Actions** перевіряються лише маніфести та гігієна репозиторію — клон сусідніх пакетів не потрібен, бо **`com.bidscube.*`** йдуть з Git за тегами.
 
-## Офіційні репозиторії на GitHub (зовнішні інтеграції)
+---
 
-Для продакшен-проєктів без монорепо ті самі пакети додають з GitHub (UPM **Add package from git URL**):
+## Офіційні репозиторії на GitHub
 
 | Пакет | Репозиторій |
 |--------|-------------|
@@ -38,25 +38,25 @@
 
 ---
 
-### Чому ще є не-Git рядки в `manifest`
+### Чому в `manifest` є Git і іноді `file:`
 
+- **`com.bidscube.sdk`**, **`com.bidscube.applovin.max`**, **`com.bidscube.levelplay`** — у цьому демо **за замовчуванням Git + тег**; **`file:../../…`** — для монорепо, коли змінюєш пакети локально.
 - **`com.applovin.mediation.ads`** — офіційний **AppLovin MAX** для UPM [роздається через їхній scoped registry](https://unity.packages.applovin.com/), а не як повноцінний UPM-пакет у публічному [AppLovin/AppLovin-MAX-Unity-Plugin](https://github.com/AppLovin/AppLovin-MAX-Unity-Plugin) (там лише демо й `.unitypackage` у релізах).
 - **`com.unity.services.levelplay`** та інші **`com.unity.*`** — **Unity Registry**.
-- **`com.google.external-dependency-manager`** — у демо: **`file:../../unity-jar-resolver/upm`** (локальний клон). Якщо є мережа до GitHub, можна замінити на Git UPM: `https://github.com/googlesamples/unity-jar-resolver.git?path=/upm#v1.2.182`.
 
 ---
 
-### Версії (монорепо vs Git)
+### Версії (Git-закріплення в демо)
 
-| Пакет | Локально (`file:../../…` у `manifest`) | Приклад Git-закріплення |
-|--------|-------------------------|-------------------------|
-| **`com.bidscube.sdk`** | `bidscube-sdk-unity/package.json` → **1.2.8** | `…/bidscube-sdk-unity.git#v1.2.8` |
-| **`com.bidscube.applovin.max`** | `AppLovin-SDK-Unity/package.json` → **1.0.19** | `…/AppLovin-SDK-for-BidsCube-Unity.git#v1.0.19` |
-| **`com.bidscube.levelplay`** | `LevelPlay-SDK-for-BidsCube-Unity/package.json` (див. локальний файл) | `…/LevelPlay-SDK-for-BidsCube-Unity.git#v…` (лише існуючі теги) |
+| Пакет | Приклад Git-закріплення в цьому репо |
+|--------|--------------------------------------|
+| **`com.bidscube.sdk`** | `…/bidscube-sdk-unity` (**`file:`**) або `…/bidscube-sdk-unity.git#v1.2.9` |
+| **`com.bidscube.applovin.max`** | `…/AppLovin-SDK-Unity` (**`file:`**) або `…/AppLovin-SDK-for-BidsCube-Unity.git#v1.0.20` |
+| **`com.bidscube.levelplay`** | `…/LevelPlay-SDK-for-BidsCube-Unity` (**`file:`**) або `…/LevelPlay-SDK-for-BidsCube-Unity.git#v1.0.5` |
 
 | Пакет | Звідки |
 |--------|--------|
-| **`com.bidscube.sdk`**, **`com.bidscube.applovin.max`**, **`com.bidscube.levelplay`** | У демо: **локальні сусідні папки** (`file:`). У зовнішніх проєктах: **GitHub** + тег. |
+| **`com.bidscube.sdk`**, **`com.bidscube.applovin.max`**, **`com.bidscube.levelplay`** | У демо: **Git + тег** (як у шаблонних `manifest*.json`); опційно **`file:`** сусідні папки |
 | **`com.google.external-dependency-manager`** | **Git** (jar-resolver UPM) |
 | **`com.applovin.mediation.ads`** | **Scoped registry** `unity.packages.applovin.com` |
 | **`com.unity.services.levelplay`** | **Unity Registry** |
@@ -97,7 +97,7 @@
 У **`Packages/manifest.json`** у `dependencies` додай:
 
 ```json
-"com.bidscube.sdk": "https://github.com/BidsCube/bidscube-sdk-unity.git#v1.2.8"
+"com.bidscube.sdk": "https://github.com/BidsCube/bidscube-sdk-unity.git#v1.2.9"
 ```
 
 Потрібні модулі: **`com.unity.ugui`**, **`com.unity.textmeshpro`** (як у шаблоні Unity / цьому демо).
@@ -121,8 +121,8 @@
 ```json
 "com.google.external-dependency-manager": "https://github.com/googlesamples/unity-jar-resolver.git?path=/upm#v1.2.182",
 "com.applovin.mediation.ads": "8.6.2",
-"com.bidscube.sdk": "https://github.com/BidsCube/bidscube-sdk-unity.git#v1.2.8",
-"com.bidscube.applovin.max": "https://github.com/BidsCube/AppLovin-SDK-for-BidsCube-Unity.git#v1.0.19"
+"com.bidscube.sdk": "https://github.com/BidsCube/bidscube-sdk-unity.git#v1.2.9",
+"com.bidscube.applovin.max": "https://github.com/BidsCube/AppLovin-SDK-for-BidsCube-Unity.git#v1.0.20"
 ```
 
 3. Окремо встанови офіційний **AppLovin MAX** з їхнього registry (версію можна оновити за потреби).
@@ -132,8 +132,8 @@
 
 **Window → Package Manager → + → Add package from git URL** — по черзі:
 
-- `https://github.com/BidsCube/bidscube-sdk-unity.git#v1.2.8`
-- `https://github.com/BidsCube/AppLovin-SDK-for-BidsCube-Unity.git#v1.0.19`
+- `https://github.com/BidsCube/bidscube-sdk-unity.git#v1.2.9`
+- `https://github.com/BidsCube/AppLovin-SDK-for-BidsCube-Unity.git#v1.0.20`
 
 Потім додай **MAX** і **EDM** вручну в `manifest` або через PM, якщо пакет це дозволяє.
 
@@ -149,3 +149,9 @@
 ```
 
 Очікується **exit 0** після оновлення тегів у `Packages/manifest*.json`.
+
+---
+
+## Додатково: лише Git (без локального core)
+
+Якщо потрібно підключити **`com.bidscube.sdk`** з **`https://github.com/BidsCube/bidscube-sdk-unity.git#v1.2.9`**, замініть рядок у всіх **`Packages/manifest*.json`** і оновіть **`tools/verify-demo-profiles.sh`** / **`verify-publisher-demo-ready.sh`**, щоб очікували Git-пін (або приймали обидва варіанти, як зараз для SDK).

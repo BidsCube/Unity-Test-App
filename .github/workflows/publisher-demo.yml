@@ -11,18 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Manifests use file:../../… (resolved from Packages/). CI only checks out this repo, so we
-      # recreate the monorepo sibling layout next to GITHUB_WORKSPACE (same as a local workspace).
-      - name: Provision sibling UPM packages (monorepo layout)
-        working-directory: ${{ github.workspace }}/..
-        env:
-          GIT_TERMINAL_PROMPT: "0"
-        run: |
-          set -euo pipefail
-          git clone --depth 1 --branch v1.2.8 https://github.com/BidsCube/bidscube-sdk-unity.git bidscube-sdk-unity
-          git clone --depth 1 --branch v1.0.19 https://github.com/BidsCube/AppLovin-SDK-for-BidsCube-Unity.git AppLovin-SDK-Unity
-          git clone --depth 1 --branch v1.0.3 https://github.com/BidsCube/LevelPlay-SDK-for-BidsCube-Unity.git LevelPlay-SDK-for-BidsCube-Unity
-          git clone --depth 1 --branch v1.2.182 https://github.com/googlesamples/unity-jar-resolver.git unity-jar-resolver
+      # Manifests pin BidsCube packages via Git tags (no sibling clone required).
 
       - name: Validate demo manifest profiles
         run: bash tools/verify-demo-profiles.sh
