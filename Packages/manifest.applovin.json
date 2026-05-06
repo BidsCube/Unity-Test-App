@@ -1,9 +1,9 @@
 {
   "dependencies": {
-    "com.google.external-dependency-manager": "file:../../unity-jar-resolver/upm",
+    "com.google.external-dependency-manager": "https://github.com/googlesamples/unity-jar-resolver.git?path=/upm#v1.2.182",
     "com.applovin.mediation.ads": "8.6.2",
-    "com.bidscube.sdk": "file:../../bidscube-sdk-unity",
-    "com.bidscube.applovin.max": "file:../../AppLovin-SDK-Unity",
+    "com.bidscube.sdk": "https://github.com/BidsCube/bidscube-sdk-unity.git#v1.2.9",
+    "com.bidscube.applovin.max": "https://github.com/BidsCube/AppLovin-SDK-for-BidsCube-Unity.git#v1.0.20",
     "com.unity.ide.visualstudio": "2.0.26",
     "com.unity.inputsystem": "1.19.0",
     "com.unity.render-pipelines.universal": "17.3.0",

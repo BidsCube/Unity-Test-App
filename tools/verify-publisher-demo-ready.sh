@@ -31,49 +31,81 @@ if git ls-files -- 'Packages/packages-lock.json' | grep -q .; then
   die "Packages/packages-lock.json is tracked — remove from git (Unity regenerates after open / profile switch)"
 fi
 
-# --- manifest pins: BidsCube UPM = local file: siblings (see tools/verify-demo-profiles.sh) ---
+# --- manifest pins: monorepo file: and/or Git (see tools/verify-demo-profiles.sh) ---
 if ! python3 << 'PY'
 import json
+import glob
 import os
 
 ROOT = os.path.realpath(".")
 PARENT = os.path.dirname(ROOT)
 
+SDK_GIT = "https://github.com/BidsCube/bidscube-sdk-unity.git#v1.2.9"
+SDK_FILE = "file:../../bidscube-sdk-unity"
+MAX_GIT = "https://github.com/BidsCube/AppLovin-SDK-for-BidsCube-Unity.git#v1.0.20"
+MAX_FILE = "file:../../AppLovin-SDK-Unity"
+LP_GIT = "https://github.com/BidsCube/LevelPlay-SDK-for-BidsCube-Unity.git#v1.0.5"
+LP_FILE = "file:../../LevelPlay-SDK-for-BidsCube-Unity"
+EDM = "https://github.com/googlesamples/unity-jar-resolver.git?path=/upm#v1.2.182"
+
+
 def load_json(path):
     with open(path, encoding="utf-8") as f:
         return json.load(f)
 
-def req_file_dep(manifest_path, dep, expected_spec):
-    data = load_json(manifest_path)
-    spec = (data.get("dependencies") or {}).get(dep)
-    if spec != expected_spec:
-        raise SystemExit(f"{manifest_path}: expected {dep}={expected_spec!r}, got {spec!r}")
-    abs_pkg = os.path.realpath(os.path.join(ROOT, "Packages", spec[5:].strip()))
+
+def validate_local_folder(folder_segment: str, expected_package: str):
+    abs_pkg = os.path.realpath(os.path.join(ROOT, "Packages", "..", "..", folder_segment))
     if os.path.dirname(abs_pkg) != PARENT:
-        raise SystemExit(f"{manifest_path}: {dep} must be sibling folder under {PARENT}")
+        raise SystemExit(f"Local package {expected_package} must be sibling under {PARENT}")
     pj = os.path.join(abs_pkg, "package.json")
     meta = load_json(pj)
-    if meta.get("name") != dep:
-        raise SystemExit(f"{pj}: name must be {dep!r}")
+    if meta.get("name") != expected_package:
+        raise SystemExit(f"{pj}: name must be {expected_package!r}")
 
-req_file_dep("Packages/manifest.direct.json", "com.bidscube.sdk", "file:../../bidscube-sdk-unity")
-req_file_dep("Packages/manifest.applovin.json", "com.bidscube.sdk", "file:../../bidscube-sdk-unity")
-req_file_dep("Packages/manifest.applovin.json", "com.bidscube.applovin.max", "file:../../AppLovin-SDK-Unity")
-req_file_dep("Packages/manifest.json", "com.bidscube.sdk", "file:../../bidscube-sdk-unity")
-req_file_dep("Packages/manifest.json", "com.bidscube.applovin.max", "file:../../AppLovin-SDK-Unity")
-req_file_dep("Packages/manifest.levelplay.json", "com.bidscube.sdk", "file:../../bidscube-sdk-unity")
-req_file_dep(
-    "Packages/manifest.levelplay.json",
-    "com.bidscube.levelplay",
-    "file:../../LevelPlay-SDK-for-BidsCube-Unity",
-)
 
-lp = load_json(os.path.join(PARENT, "bidscube-sdk-unity", "package.json"))
-if lp.get("version") != "1.2.8":
-    raise SystemExit("bidscube-sdk-unity/package.json version must be 1.2.8 for this demo revision")
-al = load_json(os.path.join(PARENT, "AppLovin-SDK-Unity", "package.json"))
-if al.get("version") != "1.0.19":
-    raise SystemExit("AppLovin-SDK-Unity/package.json version must be 1.0.19 for this demo revision")
+def req_sdk(manifest_path):
+    data = load_json(manifest_path)
+    spec = (data.get("dependencies") or {}).get("com.bidscube.sdk")
+    if spec not in (SDK_GIT, SDK_FILE):
+        raise SystemExit(f"{manifest_path}: com.bidscube.sdk must be {SDK_GIT!r} or {SDK_FILE!r}, got {spec!r}")
+    if spec == SDK_FILE:
+        validate_local_folder("bidscube-sdk-unity", "com.bidscube.sdk")
+
+
+def req_max(manifest_path):
+    data = load_json(manifest_path)
+    spec = (data.get("dependencies") or {}).get("com.bidscube.applovin.max")
+    if spec not in (MAX_GIT, MAX_FILE):
+        raise SystemExit(f"{manifest_path}: com.bidscube.applovin.max invalid: {spec!r}")
+    if spec == MAX_FILE:
+        validate_local_folder("AppLovin-SDK-Unity", "com.bidscube.applovin.max")
+
+
+def req_levelplay(manifest_path):
+    data = load_json(manifest_path)
+    spec = (data.get("dependencies") or {}).get("com.bidscube.levelplay")
+    if spec not in (LP_GIT, LP_FILE):
+        raise SystemExit(f"{manifest_path}: com.bidscube.levelplay invalid: {spec!r}")
+    if spec == LP_FILE:
+        validate_local_folder("LevelPlay-SDK-for-BidsCube-Unity", "com.bidscube.levelplay")
+
+
+req_sdk("Packages/manifest.direct.json")
+req_sdk("Packages/manifest.applovin.json")
+req_max("Packages/manifest.applovin.json")
+req_sdk("Packages/manifest.json")
+req_max("Packages/manifest.json")
+req_sdk("Packages/manifest.levelplay.json")
+req_levelplay("Packages/manifest.levelplay.json")
+
+for path in sorted(glob.glob("Packages/manifest*.json")):
+    if path.endswith("manifest.direct.json"):
+        continue
+    data = load_json(path)
+    ed = (data.get("dependencies") or {}).get("com.google.external-dependency-manager")
+    if ed != EDM:
+        raise SystemExit(f"{path}: com.google.external-dependency-manager must be {EDM!r}, got {ed!r}")
 
 mlp = load_json("Packages/manifest.levelplay.json")
 deps = mlp.get("dependencies") or {}
@@ -83,7 +115,7 @@ if deps.get("com.unity.services.levelplay") != "9.4.1":
     raise SystemExit("manifest.levelplay should pin levelplay 9.4.1")
 PY
 then
-  die "BidsCube manifest / local package validation failed"
+  die "BidsCube manifest validation failed"
 fi
 
 # --- publisher docs ---
@@ -95,19 +127,12 @@ fi
 [[ -x tools/collect-android-build-diagnostics.sh ]] || die "tools/collect-android-build-diagnostics.sh must be executable (chmod +x)"
 [[ -x tools/reset-android-build-state.sh ]] || die "tools/reset-android-build-state.sh must be executable (chmod +x)"
 grep -q 'docs/internal/ANDROID_BUILD.md' README.md || die "README should link docs/internal/ANDROID_BUILD.md (Android troubleshooting)"
-grep -qF 'v1.0.19' README.md || die "README should mention AppLovin adapter v1.0.19"
-grep -qF 'v1.2.8' README.md || die "README should mention core SDK v1.2.8"
+grep -qF 'v1.0.20' README.md || die "README should mention AppLovin adapter v1.0.20"
+grep -qF 'v1.2.9' README.md || die "README should mention core SDK v1.2.9"
+grep -qF 'v1.0.5' README.md || die "README should mention LevelPlay adapter v1.0.5"
 grep -qF 'docs/internal/' README.md || die "README should reference docs/internal/ (maintainer docs)"
 [[ -f tools/templates/BidscubeAndroidExportSettings.Lite.asset ]] || die "Missing tools/templates/BidscubeAndroidExportSettings.Lite.asset"
 [[ -f Assets/BidscubeAndroidExportSettings.asset ]] || die "Missing Assets/BidscubeAndroidExportSettings.asset (default LiteNoVideo for AppLovin demo)"
-
-# --- no phantom LevelPlay Git tag v1.0.4 (not on public GitHub) ---
-for j in Packages/manifest.json Packages/manifest.direct.json Packages/manifest.applovin.json Packages/manifest.levelplay.json; do
-  [[ -f "$j" ]] || continue
-  if grep -q 'LevelPlay-SDK-for-BidsCube-Unity\.git#v1\.0\.4' "$j"; then
-    die "Do not pin com.bidscube.levelplay to non-existent Git tag v1.0.4 ($j)"
-  fi
-done
 
 # --- Lite: committed Gradle templates must not hard-code desugaring ---
 ANDROID_GRADLE_DIR="Assets/Plugins/Android"
