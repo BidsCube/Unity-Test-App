@@ -21,7 +21,7 @@ public static class PublisherDemoVerboseBootstrap
     {
         DemoLogger.LogDemo(
             "Verbose: full stack traces on all Unity log types. Bidscube SDK: TestIntegration uses EnableLogging + EnableDebugMode. " +
-            "Android: BidscubeAndroidExportSettings keeps launcher desugaring ON (lite AAR metadata requires it for checkReleaseAarMetadata). " +
+            "Android: Lite / No Video uses bidscube-sdk-lite-no-video without hard-coded launcher desugaring in project Gradle templates; Full / Video may add desugaring via export postprocessor when needed. " +
             "MAX: verbose logging always on in this test app.");
     }
 }

@@ -2,6 +2,7 @@
 
 ## Test app defaults (this repo)
 
+- **Committed Gradle templates** (`Assets/Plugins/Android/mainTemplate.gradle`, `launcherTemplate.gradle`) do **not** hard-code `coreLibraryDesugaring` / `coreLibraryDesugaringEnabled` — Lite / No Video stays desugar-free at the project level; **FullWithVideo** relies on the postprocessor to inject desugaring into the **exported** launcher when needed.
 - **`Assets/BidscubeAndroidExportSettings.asset`** — default committed state is **LiteNoVideo** (`featureSet: 0`) for the AppLovin demo checkout. Use **`./tools/use-demo-profile.sh applovin-lite`** / **`applovin-video`** (or **`levelplay-*`**) to flip **`featureSet`** without hand-editing YAML.
 - **LiteNoVideo + `sdk-lite-no-video`:** the adapter Gradle postprocessor **strips** `coreLibraryDesugaring` / `coreLibraryDesugaringEnabled` from the **generated** **launcher** and **unityLibrary** `build.gradle` after export so the lite artifact should not force desugaring.
 - **FullWithVideo:** postprocessor **ensures** `coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'` and `coreLibraryDesugaringEnabled true` in **launcher** when missing.
