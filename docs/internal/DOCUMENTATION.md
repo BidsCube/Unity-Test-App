@@ -1,6 +1,6 @@
 # BidsCube Unity Publisher Demo — technical documentation
 
-This repository is a **publisher-facing reference Unity project**. It is **not** a production game. It exists so integrators can open one small tree, pick a **demo profile**, and see **Direct BidsCube SDK**, **AppLovin MAX**, or **Unity LevelPlay** working from a single entry scene.
+Publisher-facing quick starts live in the root **[README.md](../README.md)** and **[PUBLISHER_GUIDE.md](../PUBLISHER_GUIDE.md)**. This file is **maintainer / architecture** detail for the **Unity-Test-App** repo.
 
 **Unity-Test-App validates released packages.** It must **not** contain duplicated AARs, copied SDK sources, or manual Gradle dependencies added only to paper over packaging gaps. **Packaging and native wiring belong in the official BidsCube, AppLovin, and LevelPlay UPM packages** (and their EDM/Gradle integration). This demo stays **source-only** and avoids hiding package issues with local workarounds.
 
@@ -126,9 +126,11 @@ Log filters: **Bidscube**, **BidsCube**, **AppLovin**, **MAX**, **LevelPlay**, *
 
 ```
 README.md
-DOCUMENTATION.md
 PUBLISHER_GUIDE.md
-RELEASE_CHECKLIST.md
+docs/internal/
+  ANDROID_BUILD.md
+  DOCUMENTATION.md       # this file
+  RELEASE_CHECKLIST.md
 tools/
   use-demo-profile.sh
   use-demo-profile.ps1

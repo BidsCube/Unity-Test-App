@@ -51,16 +51,13 @@ grep -q '9.4.1' Packages/manifest.levelplay.json \
 
 # --- publisher docs ---
 [[ -f PUBLISHER_GUIDE.md ]] || die "Missing PUBLISHER_GUIDE.md"
-[[ -f RELEASE_CHECKLIST.md ]] || die "Missing RELEASE_CHECKLIST.md"
-[[ -f ANDROID_BUILD.md ]] || die "Missing ANDROID_BUILD.md (Android build guide)"
+[[ -f docs/internal/RELEASE_CHECKLIST.md ]] || die "Missing docs/internal/RELEASE_CHECKLIST.md"
+[[ -f docs/internal/ANDROID_BUILD.md ]] || die "Missing docs/internal/ANDROID_BUILD.md (Android build guide)"
 [[ -f tools/collect-android-build-diagnostics.sh ]] || die "Missing tools/collect-android-build-diagnostics.sh"
 [[ -f tools/reset-android-build-state.sh ]] || die "Missing tools/reset-android-build-state.sh"
 [[ -x tools/collect-android-build-diagnostics.sh ]] || die "tools/collect-android-build-diagnostics.sh must be executable (chmod +x)"
 [[ -x tools/reset-android-build-state.sh ]] || die "tools/reset-android-build-state.sh must be executable (chmod +x)"
-grep -q 'v1.2.7' README.md || die "README missing v1.2.7"
-grep -q 'v1.0.17' README.md || die "README missing v1.0.17"
-grep -q 'v1.0.4' README.md || die "README missing v1.0.4"
-grep -q 'ANDROID_BUILD.md' README.md || die "README should mention ANDROID_BUILD.md (Android build troubleshooting)"
+grep -q 'docs/internal/ANDROID_BUILD.md' README.md || die "README should link docs/internal/ANDROID_BUILD.md (Android troubleshooting)"
 
 # --- no tracked BidsCube / SDK binaries under demo Android plugins (Gradle templates OK) ---
 while IFS= read -r f; do

@@ -1,6 +1,6 @@
 # BidsCube Unity Publisher Demo — integration guide
 
-Audience: **publishers and integration partners** wiring BidsCube with **Direct SDK**, **AppLovin MAX**, or **Unity LevelPlay**.
+Audience: **publishers and integration partners** wiring BidsCube with **Direct SDK**, **AppLovin MAX**, or **Unity LevelPlay**. For the shortest **AppLovin MAX** path, start with the root **[README.md](README.md)**.
 
 ---
 
@@ -56,6 +56,16 @@ If **`baseURL`** on the dynamically created `TestIntegration` is empty, the demo
 4. Paste your MAX **SDK key** and ad units, or leave placeholders / empty fields to exercise **documented demo fallbacks** (see on-screen status **QA** hints — not for production).
 
 Open **Mediation Debugger** from the panel when validating network and adapter setup.
+
+---
+
+## Android APK build
+
+1. Switch to **Android** in **File → Build Settings**.
+2. For mediation profiles, run **Assets → External Dependency Manager → Android Resolver → Force Resolve** before the first Gradle export if you have not already.
+3. Build an **APK** (or AAB). Build outputs should stay local and out of git.
+
+Lite vs full video modes, duplicate-class errors, and Gradle details: **[docs/internal/ANDROID_BUILD.md](docs/internal/ANDROID_BUILD.md)**.
 
 ---
 
