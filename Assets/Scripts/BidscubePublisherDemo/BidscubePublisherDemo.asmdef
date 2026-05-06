@@ -1,0 +1,45 @@
+{
+    "name": "BidscubePublisherDemo",
+    "references": [
+        "UnityEngine.UI",
+        "Unity.TextMeshPro",
+        "Unity.InputSystem",
+        "BidscubeSDK",
+        "MaxSdk.Scripts"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.bidscube.sdk",
+            "expression": "1.0.0",
+            "define": "BIDSCUBE_DEMO_HAS_BIDSCUBE_SDK"
+        },
+        {
+            "name": "com.bidscube.applovin.max",
+            "expression": "1.0.0",
+            "define": "BIDSCUBE_DEMO_HAS_APPLOVIN_ADAPTER"
+        },
+        {
+            "name": "com.applovin.mediation.ads",
+            "expression": "8.0.0",
+            "define": "BIDSCUBE_DEMO_HAS_APPLOVIN_SDK"
+        },
+        {
+            "name": "com.bidscube.levelplay",
+            "expression": "1.0.0",
+            "define": "BIDSCUBE_DEMO_HAS_LEVELPLAY_ADAPTER"
+        },
+        {
+            "name": "com.unity.services.levelplay",
+            "expression": "9.0.0",
+            "define": "BIDSCUBE_DEMO_HAS_LEVELPLAY_SDK"
+        }
+    ],
+    "noEngineReferences": false
+}

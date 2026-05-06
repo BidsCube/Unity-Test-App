@@ -1,0 +1,21 @@
+{
+    "name": "BidscubePublisherDemo.AppLovin",
+    "references": [
+        "BidscubePublisherDemo",
+        "BidscubeSDK",
+        "MaxSdk.Scripts",
+        "BidscubeSDK.AppLovinMax"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "BIDSCUBE_DEMO_HAS_APPLOVIN_ADAPTER",
+        "BIDSCUBE_DEMO_HAS_APPLOVIN_SDK"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

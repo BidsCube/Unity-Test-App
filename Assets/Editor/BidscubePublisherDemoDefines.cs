@@ -7,14 +7,26 @@ using UnityEditor.Build;
 using UnityEngine;
 
 /// <summary>
-/// Applies <c>BIDSCUBE_HAS_APPLOVIN</c> / <c>BIDSCUBE_HAS_LEVELPLAY</c> from <c>Packages/manifest.json</c>
-/// so optional mediation code compiles only when those packages are installed.
+/// Mirrors package detection for demo asmdef define constraints and global #if symbols.
+/// See <c>BIDSCUBE_DEMO_HAS_*</c> in <c>BidscubePublisherDemo.asmdef</c> version defines.
 /// </summary>
 [InitializeOnLoad]
 static class BidscubePublisherDemoDefines
 {
-    const string DefineAppLovin = "BIDSCUBE_HAS_APPLOVIN";
-    const string DefineLevelPlay = "BIDSCUBE_HAS_LEVELPLAY";
+    const string DefineBidscubeSdk = "BIDSCUBE_DEMO_HAS_BIDSCUBE_SDK";
+    const string DefineAppLovinAdapter = "BIDSCUBE_DEMO_HAS_APPLOVIN_ADAPTER";
+    const string DefineAppLovinSdk = "BIDSCUBE_DEMO_HAS_APPLOVIN_SDK";
+    const string DefineLevelPlayAdapter = "BIDSCUBE_DEMO_HAS_LEVELPLAY_ADAPTER";
+    const string DefineLevelPlaySdk = "BIDSCUBE_DEMO_HAS_LEVELPLAY_SDK";
+
+    static readonly string[] ManagedDefines =
+    {
+        DefineBidscubeSdk,
+        DefineAppLovinAdapter,
+        DefineAppLovinSdk,
+        DefineLevelPlayAdapter,
+        DefineLevelPlaySdk
+    };
 
     static BidscubePublisherDemoDefines()
     {
@@ -34,18 +46,34 @@ static class BidscubePublisherDemoDefines
         }
     }
 
+    /// <summary>Avoids rewriting PlayerSettings when only define order differs (prevents compile / domain reload loops).</summary>
+    static bool DemoDefineSetEquals(string a, string b)
+    {
+        return string.Equals(DemoDefineCanonicalKey(a), DemoDefineCanonicalKey(b), StringComparison.Ordinal);
+    }
+
+    static string DemoDefineCanonicalKey(string defines)
+    {
+        if (string.IsNullOrEmpty(defines))
+            return "";
+        return string.Join(";", defines
+            .Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries)
+            .Distinct()
+            .OrderBy(s => s, StringComparer.Ordinal));
+    }
+
     static void ApplyDefinesFromManifest()
     {
         var manifestPath = Path.Combine(Application.dataPath, "..", "Packages", "manifest.json");
         if (!File.Exists(manifestPath))
             return;
         var text = File.ReadAllText(manifestPath);
-        var hasAppLovin = text.IndexOf("com.applovin.mediation.ads", StringComparison.Ordinal) >= 0
-            || text.IndexOf("com.bidscube.applovin.max", StringComparison.Ordinal) >= 0;
-        var hasLevelPlay = text.IndexOf("com.unity.services.levelplay", StringComparison.Ordinal) >= 0
-            || text.IndexOf("com.bidscube.levelplay", StringComparison.Ordinal) >= 0;
+        var hasBidscubeSdk = text.IndexOf("com.bidscube.sdk", StringComparison.Ordinal) >= 0;
+        var hasAppLovinAdapter = text.IndexOf("com.bidscube.applovin.max", StringComparison.Ordinal) >= 0;
+        var hasAppLovinSdk = text.IndexOf("com.applovin.mediation.ads", StringComparison.Ordinal) >= 0;
+        var hasLevelPlayAdapter = text.IndexOf("com.bidscube.levelplay", StringComparison.Ordinal) >= 0;
+        var hasLevelPlaySdk = text.IndexOf("com.unity.services.levelplay", StringComparison.Ordinal) >= 0;
 
-        // Unity 6: NamedBuildTarget is a struct, not an enum — do not use Enum.GetValues(typeof(NamedBuildTarget)).
         foreach (BuildTargetGroup group in (BuildTargetGroup[])Enum.GetValues(typeof(BuildTargetGroup)))
         {
             if (group == BuildTargetGroup.Unknown)
@@ -62,7 +90,6 @@ static class BidscubePublisherDemoDefines
 
             if (named == NamedBuildTarget.Unknown)
                 continue;
-            // Skip dedicated-server target when present (API surface differs by Unity version).
             if (string.Equals(named.TargetName, "Server", StringComparison.Ordinal))
                 continue;
 
@@ -70,18 +97,25 @@ static class BidscubePublisherDemoDefines
             {
                 var defines = PlayerSettings.GetScriptingDefineSymbols(named);
                 var parts = defines.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).ToList();
-                parts.RemoveAll(s => s == DefineAppLovin || s == DefineLevelPlay);
-                if (hasAppLovin)
-                    parts.Add(DefineAppLovin);
-                if (hasLevelPlay)
-                    parts.Add(DefineLevelPlay);
+                parts.RemoveAll(s => ManagedDefines.Contains(s));
+                parts.RemoveAll(s => s == "BIDSCUBE_HAS_APPLOVIN" || s == "BIDSCUBE_HAS_LEVELPLAY");
+                if (hasBidscubeSdk)
+                    parts.Add(DefineBidscubeSdk);
+                if (hasAppLovinAdapter)
+                    parts.Add(DefineAppLovinAdapter);
+                if (hasAppLovinSdk)
+                    parts.Add(DefineAppLovinSdk);
+                if (hasLevelPlayAdapter)
+                    parts.Add(DefineLevelPlayAdapter);
+                if (hasLevelPlaySdk)
+                    parts.Add(DefineLevelPlaySdk);
                 var next = string.Join(";", parts.Distinct());
-                if (next != defines)
+                if (!DemoDefineSetEquals(defines, next))
                     PlayerSettings.SetScriptingDefineSymbols(named, next);
             }
             catch
             {
-                // Group / named target not applicable for this Unity install
+                // Target not applicable
             }
         }
     }

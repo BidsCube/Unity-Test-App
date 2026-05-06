@@ -31,13 +31,19 @@ if git ls-files -- 'Packages/packages-lock.json' | grep -q .; then
   die "Packages/packages-lock.json is tracked — remove from git (Unity regenerates after open / profile switch)"
 fi
 
-# --- manifest pins (profile files) ---
-grep -q 'bidscube-sdk-unity.git#v1.2.5' Packages/manifest.direct.json \
-  || die "manifest.direct.json missing com.bidscube.sdk#v1.2.5"
-grep -q 'AppLovin-SDK-for-BidsCube-Unity.git#v1.0.14' Packages/manifest.applovin.json \
-  || die "manifest.applovin missing adapter#v1.0.14"
-grep -q 'LevelPlay-SDK-for-BidsCube-Unity.git#v1.0.3' Packages/manifest.levelplay.json \
-  || die "manifest.levelplay missing adapter#v1.0.3"
+# --- manifest pins: all BidsCube UPM entries = GitHub tags (no file: local paths) ---
+grep -q 'bidscube-sdk-unity\.git#v1\.2\.7' Packages/manifest.direct.json \
+  || die "manifest.direct.json: com.bidscube.sdk must use GitHub#v1.2.7 (no file:)"
+grep -q 'AppLovin-SDK-for-BidsCube-Unity.git#v1.0.17' Packages/manifest.applovin.json \
+  || die "manifest.applovin: com.bidscube.applovin.max must use GitHub#v1.0.17 (no file:)"
+grep -q 'bidscube-sdk-unity.git#v1.2.7' Packages/manifest.applovin.json \
+  || die "manifest.applovin: com.bidscube.sdk must use GitHub#v1.2.7 (no file:)"
+grep -q 'AppLovin-SDK-for-BidsCube-Unity.git#v1.0.17' Packages/manifest.json \
+  || die "manifest.json: com.bidscube.applovin.max must use GitHub#v1.0.17 (default AppLovin demo)"
+grep -q 'bidscube-sdk-unity.git#v1.2.7' Packages/manifest.json \
+  || die "manifest.json: com.bidscube.sdk must use GitHub#v1.2.7 (default AppLovin demo)"
+grep -q 'LevelPlay-SDK-for-BidsCube-Unity.git#v1.0.4' Packages/manifest.levelplay.json \
+  || die "manifest.levelplay missing adapter#v1.0.4"
 grep -q 'com.unity.services.levelplay' Packages/manifest.levelplay.json \
   || die "manifest.levelplay missing com.unity.services.levelplay"
 grep -q '9.4.1' Packages/manifest.levelplay.json \
@@ -46,9 +52,20 @@ grep -q '9.4.1' Packages/manifest.levelplay.json \
 # --- publisher docs ---
 [[ -f PUBLISHER_GUIDE.md ]] || die "Missing PUBLISHER_GUIDE.md"
 [[ -f RELEASE_CHECKLIST.md ]] || die "Missing RELEASE_CHECKLIST.md"
-grep -q 'v1.2.5' README.md || die "README missing v1.2.5"
-grep -q 'v1.0.14' README.md || die "README missing v1.0.14"
-grep -q 'v1.0.3' README.md || die "README missing v1.0.3"
+[[ -f ANDROID_BUILD.md ]] || die "Missing ANDROID_BUILD.md (Android build guide)"
+[[ -f tools/collect-android-build-diagnostics.sh ]] || die "Missing tools/collect-android-build-diagnostics.sh"
+[[ -f tools/reset-android-build-state.sh ]] || die "Missing tools/reset-android-build-state.sh"
+[[ -x tools/collect-android-build-diagnostics.sh ]] || die "tools/collect-android-build-diagnostics.sh must be executable (chmod +x)"
+[[ -x tools/reset-android-build-state.sh ]] || die "tools/reset-android-build-state.sh must be executable (chmod +x)"
+grep -q 'v1.2.7' README.md || die "README missing v1.2.7"
+grep -q 'v1.0.17' README.md || die "README missing v1.0.17"
+grep -q 'v1.0.4' README.md || die "README missing v1.0.4"
+grep -q 'ANDROID_BUILD.md' README.md || die "README should mention ANDROID_BUILD.md (Android build troubleshooting)"
+
+# --- no tracked BidsCube / SDK binaries under demo Android plugins (Gradle templates OK) ---
+while IFS= read -r f; do
+  die "Tracked .aar/.jar under Assets/Plugins/Android — remove from git; SDKs come from UPM/EDM ($f)"
+done < <(git ls-files 2>/dev/null | grep -E '^Assets/Plugins/Android/.*\.(aar|jar)$' || true)
 
 # --- demo config: placeholders only (heuristic) ---
 CFG="Assets/Resources/BidscubeDemoConfig.json"

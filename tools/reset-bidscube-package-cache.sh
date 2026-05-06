@@ -4,6 +4,12 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 CACHE="$ROOT/Library/PackageCache"
+LOCK="$ROOT/Packages/packages-lock.json"
+
+if [[ -f "$LOCK" ]]; then
+  echo "Removing Packages/packages-lock.json (Unity regenerates after resolve)"
+  rm -f "$LOCK"
+fi
 
 if [[ ! -d "$CACHE" ]]; then
   echo "No $CACHE — open Unity once, or delete Library/ entirely and reopen."

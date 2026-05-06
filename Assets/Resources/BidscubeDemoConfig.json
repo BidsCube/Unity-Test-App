@@ -1,6 +1,6 @@
 {
     "bidscube": {
-        "baseUrl": "https://YOUR_BIDSCUBE_API_HOST/",
+        "baseUrl": "",
         "appKey": "YOUR_BIDSCUBE_APP_KEY",
         "publisherId": "YOUR_PUBLISHER_ID",
         "placements": {

@@ -28,6 +28,8 @@ Pick **one** profile **before** opening Unity (or after switching, let the edito
 
 Each command copies the matching manifest to **`Packages/manifest.json`** and removes **`packages-lock.json`** so Package Manager re-resolves.
 
+**BidsCube UPM** (`com.bidscube.sdk`, `com.bidscube.applovin.max`, `com.bidscube.levelplay`) у всіх профілях підключені **лише через GitHub** (URL + тег у `manifest.*.json`) — локальних `file:…` до сусідніх репозиторіїв немає. Якщо після старих тестів залишився **`Packages/packages-lock.json`** з `file:` — закрий Unity, запусти профіль знову (скрипт видаляє lock) або видали файл вручну й дай редактору зібрати залежності заново.
+
 Validate profile JSON and pins locally:
 
 ```bash
@@ -44,6 +46,26 @@ The **default** committed **`Packages/manifest.json`** matches **`applovin`** (A
 | `applovin` | `com.bidscube.sdk` + `com.bidscube.applovin.max` + official AppLovin MAX SDK | MAX mediation demo |
 | `levelplay` | `com.bidscube.sdk` + `com.bidscube.levelplay` + official Unity LevelPlay SDK | LevelPlay mediation demo |
 
+## Demo launcher
+
+Open **`Assets/Sample scene.unity`** and press **Play**. The Canvas runs **`SdkLaunchHub`**, which builds one scrollable screen:
+
+1. **Direct SDK** — Always available when `com.bidscube.sdk` is installed. Initializes the BidsCube SDK from **`Resources/BidscubeDemoConfig.json`** (and optional inspector overrides on **`TestIntegration`** when used elsewhere). Buttons: initialize, show banner / video / native, clear ads. **Smoke test:** open **Direct SDK** → **Initialize SDK** → **Banner** / **Native**. If `bidscube.baseUrl` is empty or still a `YOUR_*` placeholder, the app keeps the SDK default SSP (`https://ssp-bcc-ads.com/sdk`). Placeholder placements resolve to the demo ID `test_placement` (see **`DirectSdkDemoDefaults`**). **AppLovin MAX** does not use this URL path; it loads ads through the MAX SDK and your ad unit IDs.
+
+2. **AppLovin MAX** — Active only when both **`com.bidscube.applovin.max`** and **`com.applovin.mediation.ads`** are in the manifest. Otherwise the section is grayed out with instructions to switch profile:
+   ```bash
+   ./tools/use-demo-profile.sh applovin
+   ```
+
+3. **LevelPlay** — Active only when both **`com.bidscube.levelplay`** and **`com.unity.services.levelplay`** are installed. Otherwise the section is grayed out:
+   ```bash
+   ./tools/use-demo-profile.sh levelplay
+   ```
+
+Optional mediation logic lives in separate assemblies (`BidscubePublisherDemo.AppLovin`, `BidscubePublisherDemo.LevelPlay`) so **direct** and **single-mediator** profiles compile without missing types. **Advanced (internal QA)** under AppLovin exposes pref reset and the legacy MAX example scene shortcut.
+
+Scripting defines follow package detection (`BIDSCUBE_DEMO_HAS_*`); see **`Assets/Editor/BidscubePublisherDemoDefines.cs`** and **`Assets/Scripts/BidscubePublisherDemo/BidscubePublisherDemo.asmdef`**.
+
 ## Requirements
 
 - Unity **6000.3.11f1** or a compatible Unity 6 editor
@@ -59,16 +81,16 @@ The **default** committed **`Packages/manifest.json`** matches **`applovin`** (A
 2. **Choose a demo profile** (see **[Choose demo profile](#choose-demo-profile)**) — default clone already uses **applovin**.
 3. Open the project in Unity and wait for **Package Manager** to resolve dependencies.
 4. Open **`Assets/Sample scene.unity`**.
-5. Edit **`Assets/Resources/BidscubeDemoConfig.json`** with your **placeholder-style** dashboard IDs only (see **[PUBLISHER_GUIDE.md](PUBLISHER_GUIDE.md)**).
+5. Optional: edit **`Assets/Resources/BidscubeDemoConfig.json`** with real dashboard IDs (see **[PUBLISHER_GUIDE.md](PUBLISHER_GUIDE.md)**). You can press **Play** without editing first to try **Direct SDK** banner/native using defaults above.
 6. Press **Play**.
 
 Optional demo videos for publishers should **not** be committed to the repo root. Attach them to **GitHub Releases** or use **README** file upload on github.com so the home page stays lightweight.
 
 ## Package versions
 
-- `com.bidscube.sdk` **v1.2.5**
-- `com.bidscube.applovin.max` **v1.0.14**
-- `com.bidscube.levelplay` **v1.0.3**
+- `com.bidscube.sdk` **v1.2.7**
+- `com.bidscube.applovin.max` **v1.0.17**
+- `com.bidscube.levelplay` **v1.0.4**
 - `com.unity.services.levelplay` **9.4.1** (LevelPlay profile)
 
 Pinned sources: **`Packages/manifest.direct.json`**, **`Packages/manifest.applovin.json`**, **`Packages/manifest.levelplay.json`**.
@@ -79,16 +101,35 @@ Unity may log **orphan `.meta`** (asset missing) or **missing `.meta`** for file
 
 - **Cause:** Stale or incomplete `.meta` layout in the **published** `com.bidscube.sdk` / `com.bidscube.applovin.max` (etc.) tags — not a bug in the demo repo.
 - **Impact:** Usually **noise** if everything compiles and runs; Editor scripts without `.meta` may be **ignored** — if anything breaks, report it to BidsCube with the package version from your manifest.
-- **What helps:** Close Unity, run **`./tools/reset-bidscube-package-cache.sh`**, reopen (forces a fresh cache). For a full reset, delete **`Library/`** entirely. Either way, warnings **can persist** until BidsCube ships fixed packages.
+- **What helps:** Close Unity, run **`./tools/reset-bidscube-package-cache.sh`** (removes **`Library/PackageCache/com.bidscube.*`** and **`Packages/packages-lock.json`**), reopen (forces a fresh resolve). For a full reset, delete **`Library/`** entirely. Either way, warnings **can persist** until BidsCube ships fixed packages.
 
 More detail: **[DOCUMENTATION.md](DOCUMENTATION.md)** (Troubleshooting).
 
 ## Android build
 
-- Switch to the **Android** platform in **Build Settings**.
-- Run **External Dependency Manager → Android Resolver** when you use profiles that ship native Android dependencies (AppLovin, LevelPlay).
-- Build **APK/AAB** locally.
-- Do **not** commit build outputs, `Library/`, or other generated folders (see **`.gitignore`**).
+For step-by-step Android setup, troubleshooting, AppLovin **LiteNoVideo / FullWithVideo**, LevelPlay, and common Gradle errors, see **[ANDROID_BUILD.md](ANDROID_BUILD.md)**.
+
+Collect environment diagnostics (branch, manifest profile, tracked plugins, Unity version):
+
+```bash
+bash tools/collect-android-build-diagnostics.sh
+```
+
+After switching profiles, you can reset local build caches (**close Unity first**):
+
+```bash
+./tools/reset-android-build-state.sh
+```
+
+**Recommended first test**
+
+1. AppLovin profile: `./tools/use-demo-profile.sh applovin`
+2. Open Unity and wait for packages to resolve.
+3. If **FullWithVideo** build fails because full video Maven dependencies are unavailable, switch to **Tools → Bidscube SDK → Android Build Features → LiteNoVideo**.
+4. **External Dependency Manager → Android Resolver → Force Resolve**, then build **APK**.
+5. After **LiteNoVideo** works, validate **FullWithVideo** separately.
+
+Also: switch to **Android** in **Build Settings**, do **not** commit APK/AAB or `Library/` (see **`.gitignore`**).
 
 ## What not to commit
 
@@ -103,6 +144,7 @@ More detail: **[DOCUMENTATION.md](DOCUMENTATION.md)** (Troubleshooting).
 ```bash
 bash tools/verify-demo-profiles.sh
 bash tools/verify-publisher-demo-ready.sh
+bash tools/collect-android-build-diagnostics.sh
 ```
 
 Architecture, hygiene rules, and a full file map: **[DOCUMENTATION.md](DOCUMENTATION.md)**. Integration walkthrough: **[PUBLISHER_GUIDE.md](PUBLISHER_GUIDE.md)**. Maintainer checklist: **[RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md)**.

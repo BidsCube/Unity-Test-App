@@ -12,7 +12,7 @@ This repository is a **publisher-facing reference Unity project**. It is **not**
 | --- | --- |
 | **`Packages/manifest.*.json`** | Declares which SDKs are installed for a given profile (`direct`, `applovin`, `levelplay`). |
 | **`tools/use-demo-profile.sh`** / **`use-demo-profile.ps1`** | Copies one profile manifest to `Packages/manifest.json` and deletes `packages-lock.json` so Unity performs a clean resolve. |
-| **`tools/verify-demo-profiles.sh`** | Validates JSON and required Git pins in all profile manifests (`bidscube-sdk-unity` tag, adapters, AppLovin registry). |
+| **`tools/verify-demo-profiles.sh`** | Validates JSON, Git tag pins, and **no `file:`** for `com.bidscube.*` in every profile manifest. |
 | **`Assets/Editor/BidscubePublisherDemoDefines.cs`** | Reads `Packages/manifest.json` and sets **`BIDSCUBE_HAS_APPLOVIN`** / **`BIDSCUBE_HAS_LEVELPLAY`** scripting define symbols so optional mediation code **does not compile** when those packages are absent. |
 | **`SdkLaunchHub`** (partials) | Builds the runtime launcher UI: **Direct SDK** always; **AppLovin** and **LevelPlay** panels only when the corresponding define exists. |
 | **`Assets/Resources/BidscubeDemoConfig.json`** | JSON placeholders for BidsCube, AppLovin, and LevelPlay IDs (no production secrets in git). |
@@ -42,9 +42,9 @@ If Android resolution fails, fix or upgrade the **package** or document the offi
 
 | File | Contents |
 | --- | --- |
-| `Packages/manifest.direct.json` | `com.bidscube.sdk` **v1.2.5** only (+ core Unity modules). |
-| `Packages/manifest.applovin.json` | Direct SDK + **`com.bidscube.applovin.max` v1.0.14** + **`com.applovin.mediation.ads`** + EDM. |
-| `Packages/manifest.levelplay.json` | Direct SDK + **`com.bidscube.levelplay` v1.0.3** + **`com.unity.services.levelplay` 9.4.1** + EDM. |
+| `Packages/manifest.direct.json` | `com.bidscube.sdk` **v1.2.7** only (+ core Unity modules). |
+| `Packages/manifest.applovin.json` | Direct SDK + **`com.bidscube.applovin.max` v1.0.17** + **`com.applovin.mediation.ads`** + EDM. |
+| `Packages/manifest.levelplay.json` | Direct SDK + **`com.bidscube.levelplay` v1.0.4** + **`com.unity.services.levelplay` 9.4.1** + EDM. |
 | `Packages/manifest.json` | **Default clone state = AppLovin profile** (copy of `manifest.applovin.json`). |
 
 Conditional compilation:
@@ -58,8 +58,8 @@ Conditional compilation:
 
 1. Hub starts with BidsCube init **disabled** and calls **`Cleanup()`** so nothing runs until the user picks a path.
 2. **Direct SDK** → **Initialize SDK** enables init and calls **`TestIntegration.InitializeSdkFromUi()`**.
-3. Base URL: Inspector **`baseURL`** on `TestIntegration` overrides; if empty, **`BidscubeDemoRuntimeConfig.BaseUrl`** from JSON is used.
-4. Placements come from **`BidscubeDemoRuntimeConfig`** (loaded from **`BidscubeDemoConfig.json`**).
+3. Base URL: Inspector **`baseURL`** on `TestIntegration` overrides when non-empty and not a `YOUR_*` / `PASTE_*` placeholder; otherwise **`BidscubeDemoRuntimeConfig.BaseUrl`** from JSON applies the same rule; if still unset, the SDK keeps its built-in default (`https://ssp-bcc-ads.com/sdk`).
+4. Placements: JSON values that are empty or placeholders are ignored; **`BidscubeDemoRuntimeConfig`** exposes **effective** IDs (demo fallback **`test_placement`** via **`DirectSdkDemoDefaults`**, aligned with the core package sample).
 5. Leaving the Direct panel clears ad parent overrides and disables init again for a clean slate.
 
 Log prefix: **`[Direct SDK]`**.
@@ -114,9 +114,11 @@ Log prefix: **`[LevelPlay SDK]`**.
 | **LevelPlay** types missing | Same for `com.unity.services.levelplay` / `com.bidscube.levelplay`. |
 | **Duplicate class** / Dex merger errors | Usually two versions of the same Android artifact; resolve with EDM and **one** stack of package versions — do not add duplicate AARs here. |
 | Ads never load (1035 / no fill) | **Placeholder keys**, geo, **test mode**, and dashboard **placements / ad units** must match the running bundle ID / package name. |
+| **Direct SDK** banner/native never appear | Use **Initialize SDK** before ad buttons. Ensure `bidscube.baseUrl` is not a fake host: empty JSON / omitted value uses default `https://ssp-bcc-ads.com/sdk`; `YOUR_*` URLs are ignored. Check **`[Direct SDK]`** logs and **`OnAdFailed`**. Effective placements are shown on the Direct panel (demo fallback: `test_placement`). |
 | Console: **meta exists but asset** … **immutable folder** (BidsCube UPM packages) | Stale **`Library/PackageCache`** or package `.meta` out of sync with the published tarball. Close Unity, delete **`Library/`**, reopen and let packages re-resolve. If it persists, remove the relevant folders under **`Library/PackageCache`** for `com.bidscube.sdk` / `com.bidscube.applovin.max` and reopen. Lasting fix belongs in those **package repos** (correct or omit `.meta` for paths that no longer exist). |
 | **[BidscubePublisherDemoDefines] Type provided must be an Enum** | Fixed in demo: Unity 6’s **`NamedBuildTarget`** is not an `enum`. Pull latest **`BidscubePublisherDemoDefines.cs`** (iterates **`BuildTargetGroup`** + **`NamedBuildTarget.FromBuildTargetGroup`**). |
- **Bidscube**, **BidsCube**, **AppLovin**, **MAX**, **LevelPlay**, **ironSource**, **duplicate class**, **UnitySendMessage**.
+
+Log filters: **Bidscube**, **BidsCube**, **AppLovin**, **MAX**, **LevelPlay**, **ironSource**, **duplicate class**, **UnitySendMessage**.
 
 ---
 
