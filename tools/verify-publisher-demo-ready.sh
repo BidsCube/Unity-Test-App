@@ -101,6 +101,23 @@ grep -qF 'docs/internal/' README.md || die "README should reference docs/interna
 [[ -f tools/templates/BidscubeAndroidExportSettings.Lite.asset ]] || die "Missing tools/templates/BidscubeAndroidExportSettings.Lite.asset"
 [[ -f Assets/BidscubeAndroidExportSettings.asset ]] || die "Missing Assets/BidscubeAndroidExportSettings.asset (default LiteNoVideo for AppLovin demo)"
 
+# --- no phantom LevelPlay Git tag v1.0.4 (not on public GitHub) ---
+for j in Packages/manifest.json Packages/manifest.direct.json Packages/manifest.applovin.json Packages/manifest.levelplay.json; do
+  [[ -f "$j" ]] || continue
+  if grep -q 'LevelPlay-SDK-for-BidsCube-Unity\.git#v1\.0\.4' "$j"; then
+    die "Do not pin com.bidscube.levelplay to non-existent Git tag v1.0.4 ($j)"
+  fi
+done
+
+# --- Lite: committed Gradle templates must not hard-code desugaring ---
+ANDROID_GRADLE_DIR="Assets/Plugins/Android"
+if grep -R --include='*.gradle' -n 'coreLibraryDesugaringEnabled true' "$ANDROID_GRADLE_DIR" 2>/dev/null | grep -q .; then
+  die "Assets/Plugins/Android: must not hard-code coreLibraryDesugaringEnabled true (Full/Video via postprocessor)"
+fi
+if grep -R --include='*.gradle' -n 'desugar_jdk_libs' "$ANDROID_GRADLE_DIR" 2>/dev/null | grep -q .; then
+  die "Assets/Plugins/Android: must not hard-code desugar_jdk_libs"
+fi
+
 # --- no tracked BidsCube / SDK binaries under demo Android plugins (Gradle templates OK) ---
 while IFS= read -r f; do
   die "Tracked .aar/.jar under Assets/Plugins/Android — remove from git; SDKs come from UPM/EDM ($f)"

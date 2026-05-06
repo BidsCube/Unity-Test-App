@@ -23,7 +23,9 @@ This project is a minimal Unity demo for testing BidsCube SDK integration with *
 8. Enter your **AppLovin MAX SDK Key** and **Ad Unit IDs** (or use the JSON / on-screen flow described in **[PUBLISHER_GUIDE.md](PUBLISHER_GUIDE.md)**).
 9. **File → Build Settings → Android**, then build and run an **APK** on a device or emulator.
 
-The default **AppLovin** checkout uses **LiteNoVideo** (`Assets/BidscubeAndroidExportSettings.asset`). Use **`./tools/use-demo-profile.sh applovin-video`** for **FullWithVideo** (video stack + launcher desugaring). See **[docs/internal/ANDROID_BUILD.md](docs/internal/ANDROID_BUILD.md)** for post-export Gradle grep checks.
+The default **AppLovin** checkout uses **LiteNoVideo** (`Assets/BidscubeAndroidExportSettings.asset`). Use **`./tools/use-demo-profile.sh applovin-video`** for **FullWithVideo** (video stack). See **[docs/internal/ANDROID_BUILD.md](docs/internal/ANDROID_BUILD.md)** for post-export Gradle grep checks.
+
+Lite / No Video mode uses `bidscube-sdk-lite-no-video` and is intended to work without core library desugaring. Full / Video mode uses `bidscube-sdk-full-video` and may enable core library desugaring if video dependencies require it.
 
 For build troubleshooting, see **[docs/internal/ANDROID_BUILD.md](docs/internal/ANDROID_BUILD.md)**.
 

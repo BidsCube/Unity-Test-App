@@ -35,6 +35,14 @@ EXPECTED = {
 
 for path in sorted(glob.glob("Packages/manifest*.json")):
     with open(path, encoding="utf-8") as f:
+        raw = f.read()
+    if "LevelPlay-SDK-for-BidsCube-Unity.git#v1.0.4" in raw:
+        raise SystemExit(
+            f"{path}: do not pin com.bidscube.levelplay to non-existent Git tag v1.0.4; use file:../../… or an existing tag"
+        )
+
+for path in sorted(glob.glob("Packages/manifest*.json")):
+    with open(path, encoding="utf-8") as f:
         data = json.load(f)
     deps = data.get("dependencies") or {}
     for name, spec in deps.items():
@@ -89,5 +97,18 @@ done
 
 # --- committed Android export template (restore after direct profile) ---
 [[ -f tools/templates/BidscubeAndroidExportSettings.Lite.asset ]] || { echo "FAIL: missing tools/templates/BidscubeAndroidExportSettings.Lite.asset"; exit 1; }
+
+# --- Lite: no hard-coded desugaring in committed Gradle templates (Full/Video via BidscubeAndroidGradleProjectPatcher) ---
+ANDROID_GRADLE_DIR="Assets/Plugins/Android"
+if grep -R --include='*.gradle' -n 'coreLibraryDesugaringEnabled true' "$ANDROID_GRADLE_DIR" 2>/dev/null | grep -q .; then
+  echo "FAIL: Lite templates must not hard-code coreLibraryDesugaringEnabled true"
+  grep -R --include='*.gradle' -n 'coreLibraryDesugaringEnabled true' "$ANDROID_GRADLE_DIR" || true
+  exit 1
+fi
+if grep -R --include='*.gradle' -n 'desugar_jdk_libs' "$ANDROID_GRADLE_DIR" 2>/dev/null | grep -q .; then
+  echo "FAIL: Lite templates must not hard-code desugar_jdk_libs"
+  grep -R --include='*.gradle' -n 'desugar_jdk_libs' "$ANDROID_GRADLE_DIR" || true
+  exit 1
+fi
 
 echo "verify-demo-profiles: OK"

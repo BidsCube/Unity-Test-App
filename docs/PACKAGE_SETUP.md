@@ -22,7 +22,7 @@
   unity-jar-resolver/              ← EDM (upm-пакет у підпапці upm/)
 ```
 
-Перевірка: `bash tools/verify-demo-profiles.sh` (наявність `package.json`, ім’я пакета, шлях — прямий «сусід» каталогу проєкту).
+Перевірка: `bash tools/verify-demo-profiles.sh` (наявність `package.json`, ім’я пакета, шлях — прямий «сусід» каталогу проєкту). У **GitHub Actions** (`.github/workflows/publisher-demo.yml`) перед цим кроком репозиторій клонує сусідні UPM-пакети в каталог **над** `GITHUB_WORKSPACE`, щоб структура збігалася з локальним монорепо.
 
 ## Офіційні репозиторії на GitHub (зовнішні інтеграції)
 
