@@ -31,23 +31,60 @@ if git ls-files -- 'Packages/packages-lock.json' | grep -q .; then
   die "Packages/packages-lock.json is tracked — remove from git (Unity regenerates after open / profile switch)"
 fi
 
-# --- manifest pins: all BidsCube UPM entries = GitHub tags (no file: local paths) ---
-grep -q 'bidscube-sdk-unity\.git#v1\.2\.8' Packages/manifest.direct.json \
-  || die "manifest.direct.json: com.bidscube.sdk must use GitHub#v1.2.8 (no file:)"
-grep -q 'AppLovin-SDK-for-BidsCube-Unity\.git#v1\.0\.19' Packages/manifest.applovin.json \
-  || die "manifest.applovin: com.bidscube.applovin.max must use GitHub#v1.0.19 (no file:)"
-grep -q 'bidscube-sdk-unity\.git#v1\.2\.8' Packages/manifest.applovin.json \
-  || die "manifest.applovin: com.bidscube.sdk must use GitHub#v1.2.8 (no file:)"
-grep -q 'AppLovin-SDK-for-BidsCube-Unity\.git#v1\.0\.19' Packages/manifest.json \
-  || die "manifest.json: com.bidscube.applovin.max must use GitHub#v1.0.19 (default AppLovin demo)"
-grep -q 'bidscube-sdk-unity\.git#v1\.2\.8' Packages/manifest.json \
-  || die "manifest.json: com.bidscube.sdk must use GitHub#v1.2.8 (default AppLovin demo)"
-grep -q 'LevelPlay-SDK-for-BidsCube-Unity\.git#v1\.0\.4' Packages/manifest.levelplay.json \
-  || die "manifest.levelplay missing adapter#v1.0.4"
-grep -q 'com.unity.services.levelplay' Packages/manifest.levelplay.json \
-  || die "manifest.levelplay missing com.unity.services.levelplay"
-grep -q '9.4.1' Packages/manifest.levelplay.json \
-  || die "manifest.levelplay should pin levelplay 9.4.1"
+# --- manifest pins: BidsCube UPM = local file: siblings (see tools/verify-demo-profiles.sh) ---
+if ! python3 << 'PY'
+import json
+import os
+
+ROOT = os.path.realpath(".")
+PARENT = os.path.dirname(ROOT)
+
+def load_json(path):
+    with open(path, encoding="utf-8") as f:
+        return json.load(f)
+
+def req_file_dep(manifest_path, dep, expected_spec):
+    data = load_json(manifest_path)
+    spec = (data.get("dependencies") or {}).get(dep)
+    if spec != expected_spec:
+        raise SystemExit(f"{manifest_path}: expected {dep}={expected_spec!r}, got {spec!r}")
+    abs_pkg = os.path.realpath(os.path.join(ROOT, "Packages", spec[5:].strip()))
+    if os.path.dirname(abs_pkg) != PARENT:
+        raise SystemExit(f"{manifest_path}: {dep} must be sibling folder under {PARENT}")
+    pj = os.path.join(abs_pkg, "package.json")
+    meta = load_json(pj)
+    if meta.get("name") != dep:
+        raise SystemExit(f"{pj}: name must be {dep!r}")
+
+req_file_dep("Packages/manifest.direct.json", "com.bidscube.sdk", "file:../../bidscube-sdk-unity")
+req_file_dep("Packages/manifest.applovin.json", "com.bidscube.sdk", "file:../../bidscube-sdk-unity")
+req_file_dep("Packages/manifest.applovin.json", "com.bidscube.applovin.max", "file:../../AppLovin-SDK-Unity")
+req_file_dep("Packages/manifest.json", "com.bidscube.sdk", "file:../../bidscube-sdk-unity")
+req_file_dep("Packages/manifest.json", "com.bidscube.applovin.max", "file:../../AppLovin-SDK-Unity")
+req_file_dep("Packages/manifest.levelplay.json", "com.bidscube.sdk", "file:../../bidscube-sdk-unity")
+req_file_dep(
+    "Packages/manifest.levelplay.json",
+    "com.bidscube.levelplay",
+    "file:../../LevelPlay-SDK-for-BidsCube-Unity",
+)
+
+lp = load_json(os.path.join(PARENT, "bidscube-sdk-unity", "package.json"))
+if lp.get("version") != "1.2.8":
+    raise SystemExit("bidscube-sdk-unity/package.json version must be 1.2.8 for this demo revision")
+al = load_json(os.path.join(PARENT, "AppLovin-SDK-Unity", "package.json"))
+if al.get("version") != "1.0.19":
+    raise SystemExit("AppLovin-SDK-Unity/package.json version must be 1.0.19 for this demo revision")
+
+mlp = load_json("Packages/manifest.levelplay.json")
+deps = mlp.get("dependencies") or {}
+if "com.unity.services.levelplay" not in deps:
+    raise SystemExit("manifest.levelplay missing com.unity.services.levelplay")
+if deps.get("com.unity.services.levelplay") != "9.4.1":
+    raise SystemExit("manifest.levelplay should pin levelplay 9.4.1")
+PY
+then
+  die "BidsCube manifest / local package validation failed"
+fi
 
 # --- publisher docs ---
 [[ -f PUBLISHER_GUIDE.md ]] || die "Missing PUBLISHER_GUIDE.md"
@@ -58,6 +95,9 @@ grep -q '9.4.1' Packages/manifest.levelplay.json \
 [[ -x tools/collect-android-build-diagnostics.sh ]] || die "tools/collect-android-build-diagnostics.sh must be executable (chmod +x)"
 [[ -x tools/reset-android-build-state.sh ]] || die "tools/reset-android-build-state.sh must be executable (chmod +x)"
 grep -q 'docs/internal/ANDROID_BUILD.md' README.md || die "README should link docs/internal/ANDROID_BUILD.md (Android troubleshooting)"
+grep -qF 'v1.0.19' README.md || die "README should mention AppLovin adapter v1.0.19"
+grep -qF 'v1.2.8' README.md || die "README should mention core SDK v1.2.8"
+grep -qF 'docs/internal/' README.md || die "README should reference docs/internal/ (maintainer docs)"
 [[ -f tools/templates/BidscubeAndroidExportSettings.Lite.asset ]] || die "Missing tools/templates/BidscubeAndroidExportSettings.Lite.asset"
 [[ -f Assets/BidscubeAndroidExportSettings.asset ]] || die "Missing Assets/BidscubeAndroidExportSettings.asset (default LiteNoVideo for AppLovin demo)"
 

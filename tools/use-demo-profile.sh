@@ -67,7 +67,11 @@ case "$PROFILE" in
     patch_android_export 1 1
     ;;
   *)
-    echo "Usage: $0 direct|applovin|applovin-lite|applovin-video|levelplay|levelplay-lite|levelplay-video"
+    echo "Usage: $0 <profile>"
+    echo "  direct"
+    echo "  applovin-lite | applovin-video"
+    echo "  levelplay-lite | levelplay-video"
+    echo "  applovin | levelplay  (legacy aliases → *-lite)"
     exit 1
     ;;
 esac

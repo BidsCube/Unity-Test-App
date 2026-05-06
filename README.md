@@ -1,6 +1,8 @@
 # BidsCube Unity Test App — Publisher Demo
 
-**Як підключити пакети (UPM, Git):** [docs/PACKAGE_SETUP.md](docs/PACKAGE_SETUP.md) — **`com.bidscube.*`** лише з [bidscube-sdk-unity](https://github.com/BidsCube/bidscube-sdk-unity) та [AppLovin-SDK-for-BidsCube-Unity](https://github.com/BidsCube/AppLovin-SDK-for-BidsCube-Unity) (див. гайд).
+**Локальні UPM-пакети (монорепо):** [docs/PACKAGE_SETUP.md](docs/PACKAGE_SETUP.md) — **`com.bidscube.*`** через **`file:../../…`** (база шляху — папка **`Packages/`** у Unity): `../../bidscube-sdk-unity`, `../../AppLovin-SDK-Unity`, `../../LevelPlay-SDK-for-BidsCube-Unity` поруч із каталогом проєкту. Офіційні репозиторії на GitHub — для релізів і зовнішніх інтеграторів.
+
+**Очікувані версії в `package.json` локальних пакетів:** `com.bidscube.sdk` **v1.2.8**, `com.bidscube.applovin.max` **v1.0.19** (split Android AARs `bidscube-sdk-lite-no-video-1.2.4.aar` / `bidscube-sdk-full-video-1.2.4.aar` in the adapter package).
 
 This project is a minimal Unity demo for testing BidsCube SDK integration with **Direct SDK**, **AppLovin MAX**, and **Unity LevelPlay**. Pick one path at a time using the profile scripts under `tools/`.
 
@@ -29,7 +31,7 @@ For build troubleshooting, see **[docs/internal/ANDROID_BUILD.md](docs/internal/
 
 ## More help
 
-- **[docs/PACKAGE_SETUP.md](docs/PACKAGE_SETUP.md)** — приклади `manifest.json`, профілі `use-demo-profile.sh`, Git URL.
+- **[docs/PACKAGE_SETUP.md](docs/PACKAGE_SETUP.md)** — `manifest.json`, профілі `use-demo-profile.sh`, локальні `file:` та (за потреби) Git URL.
 - **[PUBLISHER_GUIDE.md](PUBLISHER_GUIDE.md)** — Direct SDK, AppLovin MAX, and LevelPlay demos; where to enter keys and ad units; logs; Android build overview.
 - **Other profiles:** `./tools/use-demo-profile.sh direct`, **`applovin-lite`**, **`applovin-video`**, **`levelplay-lite`**, **`levelplay-video`** (or legacy **`applovin`** / **`levelplay`** aliases — run before opening Unity when switching).
 
