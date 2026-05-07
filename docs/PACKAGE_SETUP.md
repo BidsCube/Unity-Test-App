@@ -6,7 +6,7 @@
 
 | Пакет | Значення в `manifest` |
 |--------|----------------------|
-| **`com.bidscube.sdk`** | `https://github.com/BidsCube/bidscube-sdk-unity.git#v1.2.9` |
+| **`com.bidscube.sdk`** | `https://github.com/BidsCube/bidscube-sdk-unity.git#v1.2.10` |
 | **`com.bidscube.applovin.max`** | `https://github.com/BidsCube/AppLovin-SDK-for-BidsCube-Unity.git#v1.0.20` |
 | **`com.bidscube.levelplay`** | `https://github.com/BidsCube/LevelPlay-SDK-for-BidsCube-Unity.git#v1.0.5` |
 | **`com.google.external-dependency-manager`** | `https://github.com/googlesamples/unity-jar-resolver.git?path=/upm#v1.2.182` |
@@ -48,7 +48,7 @@ bash tools/verify-publisher-demo-ready.sh
 
 | Пакет | Git-закріплення в цьому репо |
 |--------|--------------------------------------|
-| **`com.bidscube.sdk`** | `https://github.com/BidsCube/bidscube-sdk-unity.git#v1.2.9` |
+| **`com.bidscube.sdk`** | `https://github.com/BidsCube/bidscube-sdk-unity.git#v1.2.10` |
 | **`com.bidscube.applovin.max`** | `https://github.com/BidsCube/AppLovin-SDK-for-BidsCube-Unity.git#v1.0.20` |
 | **`com.bidscube.levelplay`** | `https://github.com/BidsCube/LevelPlay-SDK-for-BidsCube-Unity.git#v1.0.5` |
 
@@ -95,7 +95,7 @@ bash tools/verify-publisher-demo-ready.sh
 У **`Packages/manifest.json`** у `dependencies` додай:
 
 ```json
-"com.bidscube.sdk": "https://github.com/BidsCube/bidscube-sdk-unity.git#v1.2.9"
+"com.bidscube.sdk": "https://github.com/BidsCube/bidscube-sdk-unity.git#v1.2.10"
 ```
 
 Потрібні модулі: **`com.unity.ugui`**, **`com.unity.textmeshpro`** (як у шаблоні Unity / цьому демо).
@@ -119,7 +119,7 @@ bash tools/verify-publisher-demo-ready.sh
 ```json
 "com.google.external-dependency-manager": "https://github.com/googlesamples/unity-jar-resolver.git?path=/upm#v1.2.182",
 "com.applovin.mediation.ads": "8.6.2",
-"com.bidscube.sdk": "https://github.com/BidsCube/bidscube-sdk-unity.git#v1.2.9",
+"com.bidscube.sdk": "https://github.com/BidsCube/bidscube-sdk-unity.git#v1.2.10",
 "com.bidscube.applovin.max": "https://github.com/BidsCube/AppLovin-SDK-for-BidsCube-Unity.git#v1.0.20"
 ```
 
@@ -130,7 +130,7 @@ bash tools/verify-publisher-demo-ready.sh
 
 **Window → Package Manager → + → Add package from git URL** — по черзі:
 
-- `https://github.com/BidsCube/bidscube-sdk-unity.git#v1.2.9`
+- `https://github.com/BidsCube/bidscube-sdk-unity.git#v1.2.10`
 - `https://github.com/BidsCube/AppLovin-SDK-for-BidsCube-Unity.git#v1.0.20`
 
 Потім додай **MAX** і **EDM** вручну в `manifest` або через PM, якщо пакет це дозволяє.

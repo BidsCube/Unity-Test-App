@@ -36,7 +36,9 @@ if ! python3 << 'PY'
 import json
 import glob
 
-SDK_GIT = "https://github.com/BidsCube/bidscube-sdk-unity.git#v1.2.9"
+SDK_GIT = "https://github.com/BidsCube/bidscube-sdk-unity.git#v1.2.10"
+SDK_LOCAL = "file:../../bidscube-sdk-unity"
+SDK_OK = (SDK_GIT, SDK_LOCAL)
 MAX_GIT = "https://github.com/BidsCube/AppLovin-SDK-for-BidsCube-Unity.git#v1.0.20"
 LP_GIT = "https://github.com/BidsCube/LevelPlay-SDK-for-BidsCube-Unity.git#v1.0.5"
 EDM = "https://github.com/googlesamples/unity-jar-resolver.git?path=/upm#v1.2.182"
@@ -50,8 +52,10 @@ def load_json(path):
 def req_sdk(manifest_path):
     data = load_json(manifest_path)
     spec = (data.get("dependencies") or {}).get("com.bidscube.sdk")
-    if spec != SDK_GIT:
-        raise SystemExit(f"{manifest_path}: com.bidscube.sdk must be {SDK_GIT!r}, got {spec!r}")
+    if spec not in SDK_OK:
+        raise SystemExit(
+            f"{manifest_path}: com.bidscube.sdk must be {SDK_GIT!r} or {SDK_LOCAL!r}, got {spec!r}"
+        )
 
 
 def req_max(manifest_path):
@@ -69,10 +73,19 @@ def req_levelplay(manifest_path):
 
 
 for path in sorted(glob.glob("Packages/manifest*.json")):
-    with open(path, encoding="utf-8") as f:
-        raw = f.read()
-    if "file:../../" in raw:
-        raise SystemExit(f"{path}: com.bidscube.* must use GitHub tag URLs, not file:../../")
+    data = load_json(path)
+    deps = data.get("dependencies") or {}
+    for name, spec in list(deps.items()):
+        if not isinstance(spec, str):
+            continue
+        if not spec.startswith("file:../../"):
+            continue
+        if name == "com.bidscube.sdk" and spec == SDK_LOCAL:
+            continue
+        raise SystemExit(
+            f"{path}: disallowed dependency {name}={spec!r} "
+            f"(only com.bidscube.sdk may use {SDK_LOCAL!r})"
+        )
 
 req_sdk("Packages/manifest.direct.json")
 req_sdk("Packages/manifest.applovin.json")
@@ -111,7 +124,7 @@ fi
 [[ -x tools/reset-android-build-state.sh ]] || die "tools/reset-android-build-state.sh must be executable (chmod +x)"
 grep -q 'docs/internal/ANDROID_BUILD.md' README.md || die "README should link docs/internal/ANDROID_BUILD.md (Android troubleshooting)"
 grep -qF 'v1.0.20' README.md || die "README should mention AppLovin adapter v1.0.20"
-grep -qF 'v1.2.9' README.md || die "README should mention core SDK v1.2.9"
+grep -qF 'v1.2.10' README.md || die "README should mention core SDK v1.2.10"
 grep -qF 'v1.0.5' README.md || die "README should mention LevelPlay adapter v1.0.5"
 grep -qF 'docs/internal/' README.md || die "README should reference docs/internal/ (maintainer docs)"
 [[ -f tools/templates/BidscubeAndroidExportSettings.Lite.asset ]] || die "Missing tools/templates/BidscubeAndroidExportSettings.Lite.asset"

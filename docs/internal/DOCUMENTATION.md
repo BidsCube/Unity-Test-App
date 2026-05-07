@@ -42,7 +42,7 @@ If Android resolution fails, fix or upgrade the **package** or document the offi
 
 | File | Contents |
 | --- | --- |
-| `Packages/manifest.direct.json` | `com.bidscube.sdk` → **Git `#v1.2.9`** + core Unity modules. |
+| `Packages/manifest.direct.json` | `com.bidscube.sdk` → **Git `#v1.2.10`** + core Unity modules. |
 | `Packages/manifest.applovin.json` | SDK + **`com.bidscube.applovin.max`** → **Git `#v1.0.20`** + **`com.applovin.mediation.ads`** + EDM. |
 | `Packages/manifest.levelplay.json` | SDK + **`com.bidscube.levelplay`** → **Git `#v1.0.5`** + **`com.unity.services.levelplay` 9.4.1** + EDM. |
 | `Packages/manifest.json` | **Default clone state = AppLovin profile** (copy of `manifest.applovin.json`). |
