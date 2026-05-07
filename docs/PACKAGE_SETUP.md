@@ -6,14 +6,12 @@
 
 | Пакет | Значення в `manifest` |
 |--------|----------------------|
-| **`com.bidscube.sdk`** | `https://github.com/BidsCube/bidscube-sdk-unity.git#v1.2.9` |
+| **`com.bidscube.sdk`** | `https://github.com/BidsCube/bidscube-sdk-unity.git#v1.2.10` |
 | **`com.bidscube.applovin.max`** | `https://github.com/BidsCube/AppLovin-SDK-for-BidsCube-Unity.git#v1.0.20` |
 | **`com.bidscube.levelplay`** | `https://github.com/BidsCube/LevelPlay-SDK-for-BidsCube-Unity.git#v1.0.5` |
 | **`com.google.external-dependency-manager`** | `https://github.com/googlesamples/unity-jar-resolver.git?path=/upm#v1.2.182` |
 
-### Локальна розробка (монорепо)
-
-Поруч із коренем Unity-проєкту можна клонувати **`bidscube-sdk-unity/`**, **`AppLovin-SDK-Unity/`**, **`LevelPlay-SDK-for-BidsCube-Unity/`** і в маніфестах замінити Git URL на **`file:../../…`** від **`Packages/`** — тоді UPM підхопить локальні копії без очікування на теги.
+У форку можна тимчасово підставити інші теги або гілки в тих самих URL — після зміни оновіть константи в **`tools/verify-demo-profiles.sh`** та **`verify-publisher-demo-ready.sh`**, щоб CI лишався зеленим.
 
 Перевірка з кореня проєкту:
 
@@ -38,9 +36,9 @@ bash tools/verify-publisher-demo-ready.sh
 
 ---
 
-### Чому в `manifest` є Git і іноді `file:`
+### Чому саме Git URL у `manifest`
 
-- **`com.bidscube.sdk`**, **`com.bidscube.applovin.max`**, **`com.bidscube.levelplay`** — у цьому демо **за замовчуванням Git + тег**; **`file:../../…`** — для монорепо, коли змінюєш пакети локально.
+- **`com.bidscube.sdk`**, **`com.bidscube.applovin.max`**, **`com.bidscube.levelplay`** — у цьому демо **лише Git + релізний тег** (як у шаблонних `manifest*.json`); **`file:../../…`** для цих пакетів у репозиторії **заборонено** скриптами перевірки.
 - **`com.applovin.mediation.ads`** — офіційний **AppLovin MAX** для UPM [роздається через їхній scoped registry](https://unity.packages.applovin.com/), а не як повноцінний UPM-пакет у публічному [AppLovin/AppLovin-MAX-Unity-Plugin](https://github.com/AppLovin/AppLovin-MAX-Unity-Plugin) (там лише демо й `.unitypackage` у релізах).
 - **`com.unity.services.levelplay`** та інші **`com.unity.*`** — **Unity Registry**.
 
@@ -48,15 +46,15 @@ bash tools/verify-publisher-demo-ready.sh
 
 ### Версії (Git-закріплення в демо)
 
-| Пакет | Приклад Git-закріплення в цьому репо |
+| Пакет | Git-закріплення в цьому репо |
 |--------|--------------------------------------|
-| **`com.bidscube.sdk`** | `…/bidscube-sdk-unity` (**`file:`**) або `…/bidscube-sdk-unity.git#v1.2.9` |
-| **`com.bidscube.applovin.max`** | `…/AppLovin-SDK-Unity` (**`file:`**) або `…/AppLovin-SDK-for-BidsCube-Unity.git#v1.0.20` |
-| **`com.bidscube.levelplay`** | `…/LevelPlay-SDK-for-BidsCube-Unity` (**`file:`**) або `…/LevelPlay-SDK-for-BidsCube-Unity.git#v1.0.5` |
+| **`com.bidscube.sdk`** | `https://github.com/BidsCube/bidscube-sdk-unity.git#v1.2.10` |
+| **`com.bidscube.applovin.max`** | `https://github.com/BidsCube/AppLovin-SDK-for-BidsCube-Unity.git#v1.0.20` |
+| **`com.bidscube.levelplay`** | `https://github.com/BidsCube/LevelPlay-SDK-for-BidsCube-Unity.git#v1.0.5` |
 
 | Пакет | Звідки |
 |--------|--------|
-| **`com.bidscube.sdk`**, **`com.bidscube.applovin.max`**, **`com.bidscube.levelplay`** | У демо: **Git + тег** (як у шаблонних `manifest*.json`); опційно **`file:`** сусідні папки |
+| **`com.bidscube.sdk`**, **`com.bidscube.applovin.max`**, **`com.bidscube.levelplay`** | **GitHub** + тег (див. таблицю вище) |
 | **`com.google.external-dependency-manager`** | **Git** (jar-resolver UPM) |
 | **`com.applovin.mediation.ads`** | **Scoped registry** `unity.packages.applovin.com` |
 | **`com.unity.services.levelplay`** | **Unity Registry** |
@@ -97,7 +95,7 @@ bash tools/verify-publisher-demo-ready.sh
 У **`Packages/manifest.json`** у `dependencies` додай:
 
 ```json
-"com.bidscube.sdk": "https://github.com/BidsCube/bidscube-sdk-unity.git#v1.2.9"
+"com.bidscube.sdk": "https://github.com/BidsCube/bidscube-sdk-unity.git#v1.2.10"
 ```
 
 Потрібні модулі: **`com.unity.ugui`**, **`com.unity.textmeshpro`** (як у шаблоні Unity / цьому демо).
@@ -121,7 +119,7 @@ bash tools/verify-publisher-demo-ready.sh
 ```json
 "com.google.external-dependency-manager": "https://github.com/googlesamples/unity-jar-resolver.git?path=/upm#v1.2.182",
 "com.applovin.mediation.ads": "8.6.2",
-"com.bidscube.sdk": "https://github.com/BidsCube/bidscube-sdk-unity.git#v1.2.9",
+"com.bidscube.sdk": "https://github.com/BidsCube/bidscube-sdk-unity.git#v1.2.10",
 "com.bidscube.applovin.max": "https://github.com/BidsCube/AppLovin-SDK-for-BidsCube-Unity.git#v1.0.20"
 ```
 
@@ -132,7 +130,7 @@ bash tools/verify-publisher-demo-ready.sh
 
 **Window → Package Manager → + → Add package from git URL** — по черзі:
 
-- `https://github.com/BidsCube/bidscube-sdk-unity.git#v1.2.9`
+- `https://github.com/BidsCube/bidscube-sdk-unity.git#v1.2.10`
 - `https://github.com/BidsCube/AppLovin-SDK-for-BidsCube-Unity.git#v1.0.20`
 
 Потім додай **MAX** і **EDM** вручну в `manifest` або через PM, якщо пакет це дозволяє.
@@ -152,6 +150,6 @@ bash tools/verify-publisher-demo-ready.sh
 
 ---
 
-## Додатково: лише Git (без локального core)
+## Оновлення тегів після релізу BidsCube
 
-Якщо потрібно підключити **`com.bidscube.sdk`** з **`https://github.com/BidsCube/bidscube-sdk-unity.git#v1.2.9`**, замініть рядок у всіх **`Packages/manifest*.json`** і оновіть **`tools/verify-demo-profiles.sh`** / **`verify-publisher-demo-ready.sh`**, щоб очікували Git-пін (або приймали обидва варіанти, як зараз для SDK).
+Після публікації нових тегів на **bidscube-sdk-unity** / адаптерах оновіть рядки **`com.bidscube.*`** у всіх **`Packages/manifest*.json`** і константи **`SDK_GIT` / `MAX_GIT` / `LP_GIT`** у **`tools/verify-demo-profiles.sh`** та **`tools/verify-publisher-demo-ready.sh`**, щоб CI лишався зеленим.

@@ -31,21 +31,16 @@ if git ls-files -- 'Packages/packages-lock.json' | grep -q .; then
   die "Packages/packages-lock.json is tracked — remove from git (Unity regenerates after open / profile switch)"
 fi
 
-# --- manifest pins: monorepo file: and/or Git (see tools/verify-demo-profiles.sh) ---
+# --- manifest pins: com.bidscube.* = GitHub tags only (see tools/verify-demo-profiles.sh) ---
 if ! python3 << 'PY'
 import json
 import glob
-import os
 
-ROOT = os.path.realpath(".")
-PARENT = os.path.dirname(ROOT)
-
-SDK_GIT = "https://github.com/BidsCube/bidscube-sdk-unity.git#v1.2.9"
-SDK_FILE = "file:../../bidscube-sdk-unity"
+SDK_GIT = "https://github.com/BidsCube/bidscube-sdk-unity.git#v1.2.10"
+SDK_LOCAL = "file:../../bidscube-sdk-unity"
+SDK_OK = (SDK_GIT, SDK_LOCAL)
 MAX_GIT = "https://github.com/BidsCube/AppLovin-SDK-for-BidsCube-Unity.git#v1.0.20"
-MAX_FILE = "file:../../AppLovin-SDK-Unity"
 LP_GIT = "https://github.com/BidsCube/LevelPlay-SDK-for-BidsCube-Unity.git#v1.0.5"
-LP_FILE = "file:../../LevelPlay-SDK-for-BidsCube-Unity"
 EDM = "https://github.com/googlesamples/unity-jar-resolver.git?path=/upm#v1.2.182"
 
 
@@ -54,42 +49,43 @@ def load_json(path):
         return json.load(f)
 
 
-def validate_local_folder(folder_segment: str, expected_package: str):
-    abs_pkg = os.path.realpath(os.path.join(ROOT, "Packages", "..", "..", folder_segment))
-    if os.path.dirname(abs_pkg) != PARENT:
-        raise SystemExit(f"Local package {expected_package} must be sibling under {PARENT}")
-    pj = os.path.join(abs_pkg, "package.json")
-    meta = load_json(pj)
-    if meta.get("name") != expected_package:
-        raise SystemExit(f"{pj}: name must be {expected_package!r}")
-
-
 def req_sdk(manifest_path):
     data = load_json(manifest_path)
     spec = (data.get("dependencies") or {}).get("com.bidscube.sdk")
-    if spec not in (SDK_GIT, SDK_FILE):
-        raise SystemExit(f"{manifest_path}: com.bidscube.sdk must be {SDK_GIT!r} or {SDK_FILE!r}, got {spec!r}")
-    if spec == SDK_FILE:
-        validate_local_folder("bidscube-sdk-unity", "com.bidscube.sdk")
+    if spec not in SDK_OK:
+        raise SystemExit(
+            f"{manifest_path}: com.bidscube.sdk must be {SDK_GIT!r} or {SDK_LOCAL!r}, got {spec!r}"
+        )
 
 
 def req_max(manifest_path):
     data = load_json(manifest_path)
     spec = (data.get("dependencies") or {}).get("com.bidscube.applovin.max")
-    if spec not in (MAX_GIT, MAX_FILE):
-        raise SystemExit(f"{manifest_path}: com.bidscube.applovin.max invalid: {spec!r}")
-    if spec == MAX_FILE:
-        validate_local_folder("AppLovin-SDK-Unity", "com.bidscube.applovin.max")
+    if spec != MAX_GIT:
+        raise SystemExit(f"{manifest_path}: com.bidscube.applovin.max must be {MAX_GIT!r}, got {spec!r}")
 
 
 def req_levelplay(manifest_path):
     data = load_json(manifest_path)
     spec = (data.get("dependencies") or {}).get("com.bidscube.levelplay")
-    if spec not in (LP_GIT, LP_FILE):
-        raise SystemExit(f"{manifest_path}: com.bidscube.levelplay invalid: {spec!r}")
-    if spec == LP_FILE:
-        validate_local_folder("LevelPlay-SDK-for-BidsCube-Unity", "com.bidscube.levelplay")
+    if spec != LP_GIT:
+        raise SystemExit(f"{manifest_path}: com.bidscube.levelplay must be {LP_GIT!r}, got {spec!r}")
 
+
+for path in sorted(glob.glob("Packages/manifest*.json")):
+    data = load_json(path)
+    deps = data.get("dependencies") or {}
+    for name, spec in list(deps.items()):
+        if not isinstance(spec, str):
+            continue
+        if not spec.startswith("file:../../"):
+            continue
+        if name == "com.bidscube.sdk" and spec == SDK_LOCAL:
+            continue
+        raise SystemExit(
+            f"{path}: disallowed dependency {name}={spec!r} "
+            f"(only com.bidscube.sdk may use {SDK_LOCAL!r})"
+        )
 
 req_sdk("Packages/manifest.direct.json")
 req_sdk("Packages/manifest.applovin.json")
@@ -128,7 +124,7 @@ fi
 [[ -x tools/reset-android-build-state.sh ]] || die "tools/reset-android-build-state.sh must be executable (chmod +x)"
 grep -q 'docs/internal/ANDROID_BUILD.md' README.md || die "README should link docs/internal/ANDROID_BUILD.md (Android troubleshooting)"
 grep -qF 'v1.0.20' README.md || die "README should mention AppLovin adapter v1.0.20"
-grep -qF 'v1.2.9' README.md || die "README should mention core SDK v1.2.9"
+grep -qF 'v1.2.10' README.md || die "README should mention core SDK v1.2.10"
 grep -qF 'v1.0.5' README.md || die "README should mention LevelPlay adapter v1.0.5"
 grep -qF 'docs/internal/' README.md || die "README should reference docs/internal/ (maintainer docs)"
 [[ -f tools/templates/BidscubeAndroidExportSettings.Lite.asset ]] || die "Missing tools/templates/BidscubeAndroidExportSettings.Lite.asset"
