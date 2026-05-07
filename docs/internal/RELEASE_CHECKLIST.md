@@ -8,7 +8,7 @@ Use this before tagging or announcing a new **publisher demo** revision.
 - [ ] No `*_BurstDebugInformation_DoNotShip/` tracked
 - [ ] No generated `*.csproj` / `*.sln` tracked
 - [ ] `Packages/packages-lock.json` is **not** tracked (unless intentionally frozen and documented)
-- [ ] **`com.bidscube.*`** у профільних маніфестах — **Git-теги** (за замовчуванням) **або** **`file:../../…`**: core **v1.2.9**, AppLovin **v1.0.20**, LevelPlay **v1.0.5**
+- [ ] **`com.bidscube.*`** у профільних маніфестах — **лише GitHub tag URL** (core **v1.2.9**, AppLovin **v1.0.20**, LevelPlay **v1.0.5**), без **`file:../../…`**
 - [ ] Версії / шляхи в **`manifest*.json`** узгоджені з релізом (core **1.2.9**, AppLovin **1.0.20**, LevelPlay **1.0.5** або актуальний тег)
 - [ ] Default `Packages/manifest.json` is **AppLovin** demo (or README documents any intentional change)
 - [ ] `tools/use-demo-profile.sh` runs for `direct`, `applovin`, `levelplay`
