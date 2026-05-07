@@ -2,6 +2,10 @@
 .idea/
 .vscode/
 
+# Unity Android Gradle export (large local build; never commit)
+/Android Export/
+/Android Export.zip
+
 # Unity generated
 [Ll]ibrary/
 [Tt]emp/
