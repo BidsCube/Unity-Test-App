@@ -1,112 +1,54 @@
-# BidsCube Unity Publisher Demo — integration guide
+# Publisher demo — integration guide
 
-Audience: **publishers and integration partners** wiring BidsCube with **Direct SDK**, **AppLovin MAX**, or **Unity LevelPlay**. For the shortest **AppLovin MAX** path, start with the root **[README.md](README.md)**. **UPM / `manifest.json` examples:** **[docs/PACKAGE_SETUP.md](docs/PACKAGE_SETUP.md)**.
+Use **[README.md](README.md)** for the shortest AppLovin path. UPM pins: **[docs/PACKAGE_SETUP.md](docs/PACKAGE_SETUP.md)**.
 
----
+## Profiles
 
-## Which demo profile to choose
+| Goal | Command |
+| --- | --- |
+| BidsCube API only (banner / video / native) | `./tools/use-demo-profile.sh direct` |
+| MAX + BidsCube, Lite / No Video | `./tools/use-demo-profile.sh applovin-lite` or `applovin` |
+| MAX + BidsCube, Full / Video | `./tools/use-demo-profile.sh applovin-video` |
+| LevelPlay + BidsCube, Lite / No Video | `./tools/use-demo-profile.sh levelplay-lite` or `levelplay` |
+| LevelPlay + BidsCube, Full / Video | `./tools/use-demo-profile.sh levelplay-video` |
 
-| Your goal | Profile | Command |
-| --- | --- | --- |
-| BidsCube API only (banner / video / native) | `direct` | `./tools/use-demo-profile.sh direct` |
-| MAX + BidsCube, **LiteNoVideo** (no video stack / no desugaring in launcher) | `applovin-lite` | `./tools/use-demo-profile.sh applovin-lite` |
-| MAX + BidsCube, **FullWithVideo** | `applovin-video` | `./tools/use-demo-profile.sh applovin-video` |
-| MAX mediation + BidsCube adapter (alias of **applovin-lite**) | `applovin` | `./tools/use-demo-profile.sh applovin` |
-| LevelPlay + BidsCube, **LiteNoVideo** | `levelplay-lite` | `./tools/use-demo-profile.sh levelplay-lite` |
-| LevelPlay + BidsCube, **FullWithVideo** | `levelplay-video` | `./tools/use-demo-profile.sh levelplay-video` |
-| Unity LevelPlay + BidsCube adapter (alias of **levelplay-lite**) | `levelplay` | `./tools/use-demo-profile.sh levelplay` |
+Run **before** opening Unity; wait for Package Manager to finish after open.
 
-Run the script **before** opening Unity, then open the folder and wait for **Package Manager** to finish resolving.
-
----
-
-## How to enter IDs
+## Keys and IDs
 
 1. Open **`Assets/Resources/BidscubeDemoConfig.json`**.
-2. Replace **`YOUR_*`** strings with values from your **BidsCube**, **AppLovin**, and/or **LevelPlay** dashboards.
-3. **Never commit** real production secrets into a public fork. Keep a **local** or **private** override if you need real keys during development.
+2. Replace `YOUR_*` values with dashboard keys (BidsCube, AppLovin, LevelPlay as needed).
+3. Do not commit production secrets.
 
-Sections:
+Sections: **`bidscube`** (optional `baseUrl`, app key, publisher, placements), **`applovin`** (MAX SDK key, ad units), **`levelplay`** (app key, ad units). UI may use PlayerPrefs over JSON for local tests.
 
-- **`bidscube`**: `baseUrl` (optional — empty or omitted uses the SDK default `https://ssp-bcc-ads.com/sdk`; `YOUR_*` values are ignored), `appKey`, `publisherId`, placement IDs (banner / video / native — `YOUR_*` placeholders are ignored and **`DirectSdkDemoDefaults`** supplies `test_placement` for a quick smoke test).
-- **`applovin`**: MAX **SDK key**, banner and **rewarded** ad unit IDs (used as launcher defaults when PlayerPrefs are empty).
-- **`levelplay`**: LevelPlay **app key**, banner and **rewarded** ad unit IDs.
+## Direct SDK
 
-The **Direct SDK** panel reads effective placements and base URL via **`BidscubeDemoRuntimeConfig`** (after placeholder stripping and demo fallbacks). The **AppLovin** and **LevelPlay** panels still allow typing in the UI; PlayerPrefs override JSON for local iteration.
-
----
-
-## Direct SDK — quick smoke test
-
-You can validate **banner** and **native** without editing JSON: use profile **`direct`** or open **1 · Direct SDK** from the default **applovin** profile → **Initialize SDK** → **Banner** / **Native**. **MAX** uses a separate code path (MAX SDK + ad units), not `bidscube.baseUrl`.
-
----
-
-## How to run the Direct SDK demo
-
-1. `./tools/use-demo-profile.sh direct` (optional if you only use the Direct panel inside the **applovin** profile).
+1. `./tools/use-demo-profile.sh direct` (optional if you use the Direct panel from the AppLovin profile).
 2. Open **`Assets/Sample scene.unity`**, press **Play**.
-3. Choose **1 · Direct SDK**, then **Initialize SDK**, then **Banner** / **Video** / **Native**.
+3. **1 · Direct SDK** → **Initialize SDK** → banner / video / native.
 
-If **`baseURL`** on the dynamically created `TestIntegration` is empty, the demo uses **`bidscube.baseUrl`** from JSON only when it is non-empty and not a placeholder; otherwise the SDK default SSP applies.
+## AppLovin MAX
 
----
+1. `./tools/use-demo-profile.sh applovin` (default `manifest.json` matches this).
+2. **Android Resolver → Force Resolve** when building Android.
+3. **2 · AppLovin MAX** in the sample scene; enter SDK key and ad units (or demo placeholders for smoke tests).
+4. Use **Mediation Debugger** from the panel when checking networks.
 
-## How to run the AppLovin demo
-
-1. `./tools/use-demo-profile.sh applovin` (or use the default repo **manifest.json**).
-2. After resolve, run **External Dependency Manager → Android Resolver** for Android.
-3. Play the sample scene → **2 · AppLovin MAX**.
-4. Paste your MAX **SDK key** and ad units, or leave placeholders / empty fields to exercise **documented demo fallbacks** (see on-screen status **QA** hints — not for production).
-
-Open **Mediation Debugger** from the panel when validating network and adapter setup.
-
----
-
-## Android APK build
-
-1. Switch to **Android** in **File → Build Settings**.
-2. For mediation profiles, run **Assets → External Dependency Manager → Android Resolver → Force Resolve** before the first Gradle export if you have not already.
-3. Build an **APK** (or AAB). Build outputs should stay local and out of git.
-
-Lite vs full video modes, duplicate-class errors, and Gradle details: **[docs/internal/ANDROID_BUILD.md](docs/internal/ANDROID_BUILD.md)**.
-
----
-
-## How to run the LevelPlay demo
+## LevelPlay
 
 1. `./tools/use-demo-profile.sh levelplay`
-2. Resolve packages; run **Android Resolver** if prompted for your Unity / LevelPlay version.
-3. Play the sample scene → **3 · LevelPlay (Unity mediation)**.
-4. Enter your **app key** and ad units or rely on **demo fallbacks** only for smoke tests.
+2. Resolve packages; **Force Resolve** if Android dependencies need it.
+3. **3 · LevelPlay** in the sample scene; enter app key and ad units.
 
----
+## Android build
 
-## How to check logs
+**File → Build Settings → Android** → build APK (or AAB). For mediation profiles, run **Force Resolve** before the first Gradle export if you have not already. Details: **[docs/internal/ANDROID_BUILD.md](docs/internal/ANDROID_BUILD.md)**.
 
-Filter the **Console** (Editor) or **logcat** (Android) for:
+## Logs
 
-- **Bidscube**, **BidsCube** — core SDK and adapter messages from BidsCube.
-- **AppLovin**, **MAX** — MAX SDK and network events.
-- **LevelPlay**, **ironSource** — Unity mediation / ironSource stack.
+Filter Editor Console or `adb logcat` for: **Bidscube**, **AppLovin**, **MAX**, **LevelPlay**, **ironSource**, **duplicate class**.
 
-When something fails at native merge or startup, search for:
+## Reporting issues
 
-- **duplicate class** — overlapping Android libraries.
-- **UnitySendMessage** — JNI / Unity bridge not ready or callback from wrong thread.
-
-This demo prefixes some lines with **`[Direct SDK]`**, **`[AppLovin SDK]`**, and **`[LevelPlay SDK]`** where applicable.
-
----
-
-## How to report issues to BidsCube
-
-Include:
-
-- **Profile** (`direct`, `applovin`, or `levelplay`) and **`Packages/manifest.json`** fragment for BidsCube packages.
-- **Unity version** (e.g. `6000.3.11f1`).
-- **Platform** (Android / iOS) and **device or emulator** details.
-- **Relevant logs** (redact secrets) with the keywords above.
-- Whether the issue reproduces in this **stock demo** with **placeholder** IDs or only with your production configuration.
-
-Open a ticket or GitHub issue per your BidsCube support channel.
+Include profile, Unity version, platform, relevant logs (redact secrets), and whether it reproduces with placeholder IDs in this stock demo.
